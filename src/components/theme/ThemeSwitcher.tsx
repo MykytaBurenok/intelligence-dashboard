@@ -1,31 +1,55 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
+import { useEffect, useSyncExternalStore } from 'react';
 
-type ThemeName = "default" | "sunset" | "light";
+const themes = ['default', 'sunset'] as const;
+type Theme = (typeof themes)[number];
+const defaultTheme: Theme = 'default';
+const themeStorageKey = 'theme';
+const themeChangeEvent = 'theme-change';
 
-const themes: ThemeName[] = ["default", "sunset", "light"];
+function isTheme(value: string | null): value is Theme {
+  return value !== null && themes.includes(value as Theme);
+}
 
-function getInitialTheme(): ThemeName {
-  if (typeof window === "undefined") {
-    return "default";
+function applyTheme(theme: Theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+}
+
+function getStoredTheme(): Theme {
+  if (typeof window === 'undefined') {
+    return defaultTheme;
   }
 
-  const savedTheme = window.localStorage.getItem("theme") as ThemeName | null;
+  const savedTheme = window.localStorage.getItem(themeStorageKey);
+  return isTheme(savedTheme) ? savedTheme : defaultTheme;
+}
 
-  if (savedTheme && themes.includes(savedTheme)) {
-    return savedTheme;
-  }
+function subscribeToTheme(callback: () => void) {
+  window.addEventListener('storage', callback);
+  window.addEventListener(themeChangeEvent, callback);
 
-  return "default";
+  return () => {
+    window.removeEventListener('storage', callback);
+    window.removeEventListener(themeChangeEvent, callback);
+  };
+}
+
+function setStoredTheme(theme: Theme) {
+  applyTheme(theme);
+  window.localStorage.setItem(themeStorageKey, theme);
+  window.dispatchEvent(new Event(themeChangeEvent));
 }
 
 export default function ThemeSwitcher() {
-  const [theme, setTheme] = useState<ThemeName>(getInitialTheme);
+  const theme = useSyncExternalStore(
+    subscribeToTheme,
+    getStoredTheme,
+    () => defaultTheme,
+  );
 
   useEffect(() => {
-    document.documentElement.setAttribute("data-theme", theme);
-    window.localStorage.setItem("theme", theme);
+    applyTheme(theme);
   }, [theme]);
 
   return (
@@ -37,12 +61,14 @@ export default function ThemeSwitcher() {
           <button
             key={item}
             type="button"
-            onClick={() => setTheme(item)}
-            className={`rounded-lg px-3 py-1.5 text-xs font-semibold capitalize transition ${
+            onClick={() => setStoredTheme(item)}
+            aria-pressed={active}
+            className={[
+              'rounded-lg px-3 py-1.5 text-xs font-semibold capitalize transition',
               active
-                ? "bg-[var(--text)] text-[var(--bg)] shadow-[var(--shadow-glow)]"
-                : "text-[var(--text-muted)] hover:bg-[var(--surface-strong)] hover:text-[var(--text)]"
-            }`}
+                ? 'bg-[var(--surface-strong)] text-[var(--text)] shadow-sm'
+                : 'text-[var(--text-muted)] hover:text-[var(--text)]',
+            ].join(' ')}
           >
             {item}
           </button>
