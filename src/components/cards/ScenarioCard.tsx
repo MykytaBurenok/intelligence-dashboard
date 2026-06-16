@@ -1,4 +1,8 @@
-export default function ScenarioCard() {
+import type { AIBrief } from "@/types/dashboard";
+
+type Props = { aiBrief: AIBrief };
+
+export default function ScenarioCard({ aiBrief }: Props) {
   const sectors = [
     { name: "Banks", score: "High" },
     { name: "Semis", score: "Medium" },
@@ -13,9 +17,7 @@ export default function ScenarioCard() {
           What this means
         </h2>
         <p className="mt-3 text-sm leading-6 text-[var(--text-muted)]">
-          The Fed remains cautious. Markets may now reprice the timing of future
-          rate cuts, with pressure shifting across equities, bonds, and the
-          dollar.
+          {aiBrief.whatThisMeans}
         </p>
       </div>
 
@@ -24,11 +26,7 @@ export default function ScenarioCard() {
           Key Takeaways
         </h2>
         <ul className="mt-4 space-y-3 text-sm text-[var(--text-muted)]">
-          {[
-            "No rate change in current meeting.",
-            "Inflation still above target.",
-            "Markets expect cuts later, not now.",
-          ].map((item) => (
+          {aiBrief.keyTakeaways.map((item) => (
             <li key={item} className="flex gap-3">
               <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--accent)]" />
               <span>{item}</span>
@@ -61,24 +59,24 @@ export default function ScenarioCard() {
       <div className="card p-5">
         <p className="dashboard-kicker">Scenario Outlook</p>
         <div className="mt-4 space-y-4">
-          <div>
-            <div className="flex justify-between gap-3 text-sm">
-              <span className="text-[var(--text-muted)]">Delayed cuts</span>
-              <span className="font-semibold text-[var(--text)]">58%</span>
+          {aiBrief.scenarios.map((scenario) => (
+            <div key={scenario.label}>
+              <div className="flex justify-between gap-3 text-sm">
+                <span className="text-[var(--text-muted)]">
+                  {scenario.label}
+                </span>
+                <span className="font-semibold text-[var(--text)]">
+                  {scenario.probability}%
+                </span>
+              </div>
+              <div className="mt-2 h-1 rounded-full bg-[var(--surface-strong)]">
+                <div
+                  className="metric-line h-full rounded-full"
+                  style={{ width: `${scenario.probability}%` }}
+                />
+              </div>
             </div>
-            <div className="mt-2 h-1 rounded-full bg-[var(--surface-strong)]">
-              <div className="metric-line h-full w-[58%] rounded-full" />
-            </div>
-          </div>
-          <div>
-            <div className="flex justify-between gap-3 text-sm">
-              <span className="text-[var(--text-muted)]">Soft landing</span>
-              <span className="font-semibold text-[var(--text)]">34%</span>
-            </div>
-            <div className="mt-2 h-1 rounded-full bg-[var(--surface-strong)]">
-              <div className="metric-line h-full w-[34%] rounded-full" />
-            </div>
-          </div>
+          ))}
         </div>
       </div>
     </div>

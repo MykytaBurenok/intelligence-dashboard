@@ -4,48 +4,110 @@ import Header from "@/components/layout/Header";
 import EventCard from "@/components/cards/EventCard";
 import ImpactCard from "@/components/cards/ImpactCard";
 import ScenarioCard from "@/components/cards/ScenarioCard";
+import { getDashboardData } from "@/lib/dashboard";
+import type { AIBrief } from "@/types/dashboard";
 
-const impacts = [
-  {
-    label: "Market",
-    name: "Dollar index reaction",
-    value: "103.42",
-    change: "+0.68%",
-    description: "Bid strengthens as rate-cut timing moves later.",
-    intensity: 76,
-  },
-  {
-    label: "Volatility",
-    name: "Energy market volatility",
-    value: "21.8",
-    change: "+2.1%",
-    description: "Oil sensitivity rises with dollar and growth uncertainty.",
-    intensity: 64,
-  },
-  {
-    label: "Narrative",
-    name: "Narrative strength",
-    value: "8.4",
-    change: "+0.9",
-    description: "Policy divergence cluster is gaining cross-source support.",
-    intensity: 84,
-  },
-  {
-    label: "Scenario",
-    name: "Delayed-cut probability",
-    value: "58%",
-    change: "+11%",
-    description: "Consensus path shifts toward a longer hold window.",
-    intensity: 58,
-  },
-];
+export const revalidate = 300;
 
-export default function HomePage() {
+type MetricItem = {
+  label: string;
+  name: string;
+  value: string;
+  change: string;
+  description: string;
+  intensity: number;
+};
+
+type FeaturedShift = {
+  title: string;
+  summary: string;
+  confidence: number;
+  direction: string;
+  affectedNarratives: string[];
+  affectedMarkets: string[];
+  impactScore: number;
+  updatedAt: string;
+};
+
+export default async function HomePage() {
+  const data = await getDashboardData();
+
+  const metrics: MetricItem[] = [
+    {
+      label: "Market",
+      name: data.quotes[0]?.symbol ?? "DXY",
+      value: data.quotes[0] ? data.quotes[0].current.toFixed(2) : "—",
+      change: data.quotes[0]
+        ? `${data.quotes[0].percentChange >= 0 ? "+" : ""}${data.quotes[0].percentChange.toFixed(2)}%`
+        : "—",
+      description: "Dollar index reaction to macro policy shift.",
+      intensity: Math.min(
+        Math.abs(data.quotes[0]?.percentChange ?? 0) * 20,
+        100,
+      ),
+    },
+    {
+      label: "Commodities",
+      name: data.quotes[1]?.symbol ?? "Gold",
+      value: data.quotes[1] ? data.quotes[1].current.toFixed(2) : "—",
+      change: data.quotes[1]
+        ? `${data.quotes[1].percentChange >= 0 ? "+" : ""}${data.quotes[1].percentChange.toFixed(2)}%`
+        : "—",
+      description: "Safe haven demand tracked against dollar moves.",
+      intensity: Math.min(
+        Math.abs(data.quotes[1]?.percentChange ?? 0) * 15,
+        100,
+      ),
+    },
+    {
+      label: "Narrative",
+      name: "Narrative strength",
+      value: `${data.brief.confidence}`,
+      change: "+0.9",
+      description: "Policy divergence cluster gaining cross-source support.",
+      intensity: data.brief.confidence,
+    },
+    {
+      label: "Scenario",
+      name: data.brief.takeaways[0] ?? "Delayed-cut probability",
+      value: "58%",
+      change: "+11%",
+      description: "Consensus path shifts toward a longer hold window.",
+      intensity: 58,
+    },
+  ];
+
+  const featuredShift: FeaturedShift = {
+    title: data.brief.headline,
+    summary: data.brief.summary,
+    confidence: data.brief.confidence,
+    direction: "Risk-off",
+    affectedNarratives: [
+      "Policy divergence",
+      "Dollar resilience",
+      "Soft landing",
+    ],
+    affectedMarkets: data.quotes.map((q) => q.symbol).slice(0, 4),
+    impactScore: data.brief.confidence,
+    updatedAt: data.generatedAt,
+  };
+
+  const aiBrief: AIBrief = {
+    whatThisMeans: data.brief.summary,
+    keyTakeaways: data.brief.takeaways,
+    featuredTitle: data.brief.headline,
+    scenarios: [
+      { label: "Delayed cuts", probability: 58 },
+      { label: "Soft landing", probability: 34 },
+      { label: "Recession risk", probability: 8 },
+    ],
+  };
+
   return (
     <Shell
       sidebar={<Sidebar />}
       header={<Header />}
-      rightPanel={<ScenarioCard />}
+      rightPanel={<ScenarioCard aiBrief={aiBrief} />}
     >
       <div className="mx-auto max-w-[1120px] space-y-6">
         <section className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
@@ -78,7 +140,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        <EventCard />
+        <EventCard shift={featuredShift} />
 
         <section>
           <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
@@ -94,16 +156,8 @@ export default function HomePage() {
           </div>
 
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 2xl:grid-cols-4">
-            {impacts.map((item) => (
-              <ImpactCard
-                key={item.name}
-                label={item.label}
-                name={item.name}
-                value={item.value}
-                change={item.change}
-                description={item.description}
-                intensity={item.intensity}
-              />
+            {metrics.map((item) => (
+              <ImpactCard key={item.name} {...item} />
             ))}
           </div>
         </section>
@@ -112,25 +166,28 @@ export default function HomePage() {
           <div className="card p-5">
             <p className="dashboard-kicker">Narrative Shift</p>
             <h2 className="mt-2 text-lg font-semibold text-[var(--text)]">
-              Dollar resilience is overtaking soft-landing optimism
+              {data.articles[1]?.title ??
+                "Dollar resilience overtaking soft-landing optimism"}
             </h2>
             <p className="mt-3 text-sm leading-6 text-[var(--text-muted)]">
-              Source clustering shows policy commentary and front-end yield
-              action carrying more weight than equity earnings momentum.
+              {data.articles[1]?.description ??
+                "Source clustering shows policy commentary carrying more weight than equity earnings momentum."}
             </p>
           </div>
 
           <div className="card p-5">
             <p className="dashboard-kicker">Next Watch</p>
             <h2 className="mt-2 text-lg font-semibold text-[var(--text)]">
-              CPI surprise threshold
+              {data.articles[2]?.title ?? "CPI surprise threshold"}
             </h2>
             <p className="mt-3 text-sm leading-6 text-[var(--text-muted)]">
-              A hotter print would likely push delayed-cut probability above
-              65% and raise dollar sensitivity.
+              {data.articles[2]?.description ??
+                "A hotter print would likely push delayed-cut probability above 65%."}
             </p>
           </div>
         </section>
+
+        <div className="h-8" />
       </div>
     </Shell>
   );
