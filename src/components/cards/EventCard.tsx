@@ -82,17 +82,13 @@ export default function EventCard() {
           <div className="mt-5 h-1.5 rounded-full bg-[var(--surface-strong)]">
             <div className="metric-line h-full w-[82%] rounded-full" />
           </div>
-          <div className="mt-5 grid grid-cols-3 gap-2">
+          <div className="mt-5 grid grid-cols-6 gap-1.5 h-14 items-end">
             {[38, 56, 74, 69, 82, 77].map((height, index) => (
               <div
-                key={`${height}-${index}`}
-                className="flex h-16 items-end rounded-lg bg-[var(--surface-soft)] px-1.5 pb-1.5"
-              >
-                <div
-                  className="w-full rounded-md bg-[var(--accent)] opacity-80"
-                  style={{ height: `${height}%` }}
-                />
-              </div>
+                key={index}
+                className="rounded-sm bg-[var(--accent)] opacity-70 transition-opacity hover:opacity-100"
+                style={{ height: `${height}%` }}
+              />
             ))}
           </div>
           <p className="mt-4 text-xs leading-5 text-[var(--text-muted)]">

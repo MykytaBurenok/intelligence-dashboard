@@ -1,11 +1,23 @@
+"use client";
+
+import {
+  Home,
+  Radio,
+  BarChart2,
+  BookOpen,
+  GitBranch,
+  Bookmark,
+  Settings,
+} from "lucide-react";
+
 const navItems = [
-  "Home",
-  "Signals",
-  "Markets",
-  "Narratives",
-  "Scenarios",
-  "Watchlist",
-  "Settings",
+  { label: "Home", icon: Home },
+  { label: "Signals", icon: Radio },
+  { label: "Markets", icon: BarChart2 },
+  { label: "Narratives", icon: BookOpen },
+  { label: "Scenarios", icon: GitBranch },
+  { label: "Watchlist", icon: Bookmark },
+  { label: "Settings", icon: Settings },
 ];
 
 export default function Sidebar() {
@@ -28,19 +40,19 @@ export default function Sidebar() {
       </div>
 
       <nav className="grid gap-2">
-        {navItems.map((item, index) => (
+        {navItems.map(({ label, icon: Icon }, index) => (
           <button
-            key={item}
+            key={label}
             className={`flex w-full items-center gap-3 rounded-xl border px-3 py-2.5 text-left text-sm font-medium transition ${
               index === 0
                 ? "border-[var(--border-strong)] bg-[var(--surface-strong)] text-[var(--text)] shadow-[var(--shadow-accent)]"
                 : "border-transparent text-[var(--text-muted)] hover:border-[var(--border)] hover:bg-[var(--surface-soft)] hover:text-[var(--text)]"
             }`}
           >
-            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[var(--surface-soft)] text-[0.68rem] font-semibold text-[var(--accent)]">
-              {item.slice(0, 2).toUpperCase()}
+            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[var(--surface-soft)] text-[var(--accent)]">
+              <Icon size={14} strokeWidth={1.75} />
             </span>
-            <span className="hidden xl:inline">{item}</span>
+            <span className="hidden xl:inline">{label}</span>
           </button>
         ))}
       </nav>
