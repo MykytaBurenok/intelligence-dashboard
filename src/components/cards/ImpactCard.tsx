@@ -30,7 +30,9 @@ export default function ImpactCard({
         </div>
         <span className="h-2 w-2 rounded-full bg-[var(--accent)] shadow-[var(--shadow-glow)]" />
       </div>
+
       <p className="mt-3 text-2xl font-semibold text-[var(--text)]">{value}</p>
+
       <p
         className={`mt-1 text-sm font-semibold ${
           positive ? "text-[var(--success)]" : "text-[var(--danger)]"
@@ -38,12 +40,14 @@ export default function ImpactCard({
       >
         {change}
       </p>
+
       <div className="mt-4 h-1 rounded-full bg-[var(--surface-strong)]">
         <div
           className="metric-line h-full rounded-full"
           style={{ width: `${intensity}%` }}
         />
       </div>
+
       <p className="mt-3 text-xs leading-5 text-[var(--text-faint)]">
         {description}
       </p>

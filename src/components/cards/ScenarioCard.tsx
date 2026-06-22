@@ -1,6 +1,8 @@
 import type { AIBrief } from "@/types/dashboard";
 
-type Props = { aiBrief: AIBrief };
+type Props = {
+  aiBrief: AIBrief;
+};
 
 export default function ScenarioCard({ aiBrief }: Props) {
   const sectors = [

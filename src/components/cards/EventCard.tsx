@@ -11,6 +11,21 @@ type Props = {
   };
 };
 
+function formatUpdatedAt(value: string) {
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
+  return date.toLocaleString("en-US", {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
+}
+
 export default function EventCard({ shift }: Props) {
   return (
     <section className="panel overflow-hidden p-5 sm:p-6 lg:p-7">
@@ -18,7 +33,7 @@ export default function EventCard({ shift }: Props) {
         <div>
           <p className="dashboard-kicker">Featured Shift</p>
           <p className="mt-1 text-sm text-[var(--text-faint)]">
-            Updated just now · macro policy cluster
+            Updated {formatUpdatedAt(shift.updatedAt)} · macro policy cluster
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -94,7 +109,7 @@ export default function EventCard({ shift }: Props) {
               style={{ width: `${shift.impactScore}%` }}
             />
           </div>
-          <div className="mt-5 grid grid-cols-6 gap-1.5 h-14 items-end">
+          <div className="mt-5 grid h-14 grid-cols-6 items-end gap-1.5">
             {[38, 56, 74, 69, 82, 77].map((height, index) => (
               <div
                 key={index}
