@@ -12,7 +12,6 @@ import {
   Settings,
 } from "lucide-react";
 import { Compass } from "lucide-react";
-
 const navItems = [
   { label: "Home", href: "/", icon: Home },
   { label: "Signals", href: "/signals", icon: Radio },
