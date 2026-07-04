@@ -7,7 +7,7 @@ import ScenarioCard from "@/components/cards/ScenarioCard";
 import { getDashboardData } from "@/lib/dashboard";
 import { buildAIBrief } from "@/lib/dashboard-helpers";
 import type { AIBrief } from "@/types/dashboard";
-
+import NewsSwitcher from "@/components/layout/NewsSwitcher";
 export const dynamic = "force-dynamic";
 
 type MetricItem = {
@@ -157,14 +157,7 @@ export default async function HomePage() {
         <section className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
           <div className="card p-5">
             <p className="dashboard-kicker">Narrative Shift</p>
-            <h2 className="mt-2 text-lg font-semibold text-[var(--text)]">
-              {data.articles[1]?.title ??
-                "Dollar resilience overtaking soft-landing optimism"}
-            </h2>
-            <p className="mt-3 text-sm leading-6 text-[var(--text-muted)]">
-              {data.articles[1]?.description ??
-                "Source clustering shows policy commentary carrying more weight than equity earnings momentum."}
-            </p>
+            <NewsSwitcher articles={data.articles} />
           </div>
 
           <div className="card p-5">

@@ -1,6 +1,6 @@
 import DashboardPageShell from "@/components/layout/DashboardPageShell";
 import { getDashboardData } from "@/lib/dashboard";
-
+import NewsSwitcher from "@/components/layout/NewsSwitcher";
 export const dynamic = "force-dynamic";
 
 export default async function ExplorePage() {
@@ -20,24 +20,7 @@ export default async function ExplorePage() {
       </section>
 
       <section className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
-        <div className="card p-5">
-          <p className="dashboard-kicker">Articles</p>
-          <div className="mt-4 space-y-3">
-            {data.articles.slice(0, 6).map((article, index) => (
-              <article
-                key={`${article.title}-${index}`}
-                className="rounded-xl border border-[var(--border)] bg-[var(--surface-soft)] p-4"
-              >
-                <h2 className="text-base font-semibold text-[var(--text)]">
-                  {article.title}
-                </h2>
-                <p className="mt-2 text-sm leading-6 text-[var(--text-muted)]">
-                  {article.description ?? "No description available."}
-                </p>
-              </article>
-            ))}
-          </div>
-        </div>
+        <NewsSwitcher articles={data.articles} />
 
         <div className="space-y-4">
           <div className="card p-5">
