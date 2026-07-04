@@ -2,7 +2,7 @@ import DashboardPageShell from "@/components/layout/DashboardPageShell";
 import { getDashboardData } from "@/lib/dashboard";
 import { buildAIBrief } from "@/lib/dashboard-helpers";
 
-export const revalidate = 300;
+export const dynamic = "force-dynamic";
 
 export default async function ScenariosPage() {
   const data = await getDashboardData();

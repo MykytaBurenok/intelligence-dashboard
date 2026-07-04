@@ -1,7 +1,7 @@
 import DashboardPageShell from "@/components/layout/DashboardPageShell";
 import { getDashboardData } from "@/lib/dashboard";
 
-export const revalidate = 300;
+export const dynamic = "force-dynamic";
 
 function formatMove(value: number) {
   return `${value >= 0 ? "+" : ""}${value.toFixed(2)}%`;

@@ -8,7 +8,7 @@ import { getDashboardData } from "@/lib/dashboard";
 import { buildAIBrief } from "@/lib/dashboard-helpers";
 import type { AIBrief } from "@/types/dashboard";
 
-export const revalidate = 300;
+export const dynamic = "force-dynamic";
 
 type MetricItem = {
   label: string;
