@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   Home,
   Radio,
@@ -9,18 +11,22 @@ import {
   Bookmark,
   Settings,
 } from "lucide-react";
+import { Compass } from "lucide-react";
 
 const navItems = [
-  { label: "Home", icon: Home },
-  { label: "Signals", icon: Radio },
-  { label: "Markets", icon: BarChart2 },
-  { label: "Narratives", icon: BookOpen },
-  { label: "Scenarios", icon: GitBranch },
-  { label: "Watchlist", icon: Bookmark },
-  { label: "Settings", icon: Settings },
+  { label: "Home", href: "/", icon: Home },
+  { label: "Signals", href: "/signals", icon: Radio },
+  { label: "Markets", href: "/markets", icon: BarChart2 },
+  { label: "Narratives", href: "/narratives", icon: BookOpen },
+  { label: "Scenarios", href: "/scenarios", icon: GitBranch },
+  { label: "Watchlist", href: "/watchlist", icon: Bookmark },
+  { label: "Explore", href: "/explore", icon: Compass },
+  { label: "Settings", href: "/settings", icon: Settings },
 ];
 
 export default function Sidebar() {
+  const pathname = usePathname();
+
   return (
     <div className="flex min-h-full flex-col gap-8">
       <div>
@@ -40,21 +46,27 @@ export default function Sidebar() {
       </div>
 
       <nav className="grid gap-2">
-        {navItems.map(({ label, icon: Icon }, index) => (
-          <button
-            key={label}
-            className={`flex w-full items-center gap-3 rounded-xl border px-3 py-2.5 text-left text-sm font-medium transition ${
-              index === 0
-                ? "border-[var(--border-strong)] bg-[var(--surface-strong)] text-[var(--text)] shadow-[var(--shadow-accent)]"
-                : "border-transparent text-[var(--text-muted)] hover:border-[var(--border)] hover:bg-[var(--surface-soft)] hover:text-[var(--text)]"
-            }`}
-          >
-            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[var(--surface-soft)] text-[var(--accent)]">
-              <Icon size={14} strokeWidth={1.75} />
-            </span>
-            <span className="hidden xl:inline">{label}</span>
-          </button>
-        ))}
+        {navItems.map(({ label, href, icon: Icon }) => {
+          const isActive =
+            href === "/" ? pathname === "/" : pathname.startsWith(href);
+
+          return (
+            <Link
+              key={label}
+              href={href}
+              className={`flex w-full items-center gap-3 rounded-xl border px-3 py-2.5 text-left text-sm font-medium transition ${
+                isActive
+                  ? "border-[var(--border-strong)] bg-[var(--surface-strong)] text-[var(--text)] shadow-[var(--shadow-accent)]"
+                  : "border-transparent text-[var(--text-muted)] hover:border-[var(--border)] hover:bg-[var(--surface-soft)] hover:text-[var(--text)]"
+              }`}
+            >
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[var(--surface-soft)] text-[var(--accent)]">
+                <Icon size={14} strokeWidth={1.75} />
+              </span>
+              <span className="hidden xl:inline">{label}</span>
+            </Link>
+          );
+        })}
       </nav>
 
       <div className="panel mt-auto hidden p-4 xl:block">

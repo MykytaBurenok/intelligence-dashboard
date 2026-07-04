@@ -5,6 +5,7 @@ import EventCard from "@/components/cards/EventCard";
 import ImpactCard from "@/components/cards/ImpactCard";
 import ScenarioCard from "@/components/cards/ScenarioCard";
 import { getDashboardData } from "@/lib/dashboard";
+import { buildAIBrief } from "@/lib/dashboard-helpers";
 import type { AIBrief } from "@/types/dashboard";
 
 export const revalidate = 300;
@@ -92,16 +93,7 @@ export default async function HomePage() {
     updatedAt: data.generatedAt,
   };
 
-  const aiBrief: AIBrief = {
-    whatThisMeans: data.brief.summary,
-    keyTakeaways: data.brief.takeaways,
-    featuredTitle: data.brief.headline,
-    scenarios: [
-      { label: "Delayed cuts", probability: 58 },
-      { label: "Soft landing", probability: 34 },
-      { label: "Recession risk", probability: 8 },
-    ],
-  };
+  const aiBrief: AIBrief = buildAIBrief(data);
 
   return (
     <Shell
