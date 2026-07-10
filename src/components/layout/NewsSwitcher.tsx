@@ -1,16 +1,19 @@
 "use client";
 
-import { useState } from "react";
 import type { DashboardArticle } from "@/types/dashboard";
 import WatchButton from "@/components/dashboard/WatchButton";
 
 type NewsSwitcherProps = {
   articles: DashboardArticle[];
+  activeIndex: number;
+  onChange: (index: number) => void;
 };
 
-export default function NewsSwitcher({ articles }: NewsSwitcherProps) {
-  const [activeIndex, setActiveIndex] = useState(0);
-
+export default function NewsSwitcher({
+  articles,
+  activeIndex,
+  onChange,
+}: NewsSwitcherProps) {
   if (!articles.length) {
     return (
       <div className="mt-3 text-sm text-[var(--text-muted)]">
@@ -30,7 +33,7 @@ export default function NewsSwitcher({ articles }: NewsSwitcherProps) {
           <button
             key={`${article.title}-${index}`}
             type="button"
-            onClick={() => setActiveIndex(index)}
+            onClick={() => onChange(index)}
             className={`rounded-xl border px-3 py-2 text-xs font-semibold transition ${
               safeIndex === index
                 ? "border-[var(--border-strong)] bg-[var(--surface-strong)] text-[var(--text)]"
