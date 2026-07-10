@@ -44,13 +44,13 @@ Architecture
 Built around a set of reusable, composable UI building blocks rather than page-specific one-off code:
 
 Shell
-├── Sidebar
-├── Header
-├── EventCard
-├── ImpactCard
-├── ScenarioCard
-├── ThemeSwitcher
-└── NewsSwitcher
+Sidebar
+Header
+EventCard
+ImpactCard
+ScenarioCard
+ThemeSwitcher
+NewsSwitcher
 
 Core architectural principles:
 
