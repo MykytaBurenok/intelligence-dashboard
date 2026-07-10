@@ -6,7 +6,7 @@ It brings market signals, news flow, narrative shifts, and AI-generated briefing
 
 ![App demo GIF](./public/images/preview.gif)
 
-Screenshots
+
 
 ### Home page
 
