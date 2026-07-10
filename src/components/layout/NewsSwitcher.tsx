@@ -1,12 +1,13 @@
 "use client";
 
+import { useState } from "react";
 import type { DashboardArticle } from "@/types/dashboard";
 import WatchButton from "@/components/dashboard/WatchButton";
 
 type NewsSwitcherProps = {
   articles: DashboardArticle[];
-  activeIndex: number;
-  onChange: (index: number) => void;
+  activeIndex?: number;
+  onChange?: (index: number) => void;
 };
 
 export default function NewsSwitcher({
@@ -14,6 +15,8 @@ export default function NewsSwitcher({
   activeIndex,
   onChange,
 }: NewsSwitcherProps) {
+  const [internalIndex, setInternalIndex] = useState(0);
+
   if (!articles.length) {
     return (
       <div className="mt-3 text-sm text-[var(--text-muted)]">
@@ -23,8 +26,21 @@ export default function NewsSwitcher({
   }
 
   const visibleArticles = articles.slice(0, 5);
-  const safeIndex = Math.min(activeIndex, visibleArticles.length - 1);
+  const isControlled =
+    typeof activeIndex === "number" && typeof onChange === "function";
+
+  const currentIndex = isControlled ? activeIndex : internalIndex;
+  const safeIndex = Math.min(currentIndex, visibleArticles.length - 1);
   const activeArticle = visibleArticles[safeIndex];
+
+  function handleChange(index: number) {
+    if (isControlled && onChange) {
+      onChange(index);
+      return;
+    }
+
+    setInternalIndex(index);
+  }
 
   return (
     <div className="mt-3">
@@ -33,7 +49,7 @@ export default function NewsSwitcher({
           <button
             key={`${article.title}-${index}`}
             type="button"
-            onClick={() => onChange(index)}
+            onClick={() => handleChange(index)}
             className={`rounded-xl border px-3 py-2 text-xs font-semibold transition ${
               safeIndex === index
                 ? "border-[var(--border-strong)] bg-[var(--surface-strong)] text-[var(--text)]"
