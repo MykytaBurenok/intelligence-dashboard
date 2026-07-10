@@ -1,3 +1,6 @@
+import WatchButton from "@/components/dashboard/WatchButton";
+import ShareButton from "@/components/dashboard/ShareButton";
+
 type Props = {
   shift: {
     title: string;
@@ -36,6 +39,7 @@ export default function EventCard({ shift }: Props) {
             Updated {formatUpdatedAt(shift.updatedAt)} · macro policy cluster
           </p>
         </div>
+
         <div className="flex flex-wrap gap-2">
           <div className="rounded-full border border-[var(--border)] bg-[var(--accent-soft)] px-3 py-1 text-xs font-semibold text-[var(--accent)]">
             Confidence {shift.confidence}%
@@ -48,9 +52,16 @@ export default function EventCard({ shift }: Props) {
 
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_300px]">
         <div>
-          <h2 className="max-w-3xl text-3xl font-semibold leading-tight tracking-normal text-[var(--text)] sm:text-4xl">
-            {shift.title}
-          </h2>
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <h2 className="max-w-3xl text-3xl font-semibold leading-tight tracking-normal text-[var(--text)] sm:text-4xl">
+              {shift.title}
+            </h2>
+
+            <div className="flex shrink-0 flex-wrap gap-2">
+              <ShareButton title={shift.title} />
+              <WatchButton item={shift.title} />
+            </div>
+          </div>
 
           <p className="mt-4 max-w-3xl text-sm leading-6 text-[var(--text-muted)]">
             {shift.summary}
