@@ -26,6 +26,7 @@ type NewsFeedProps = {
   onFilterChange?: (filter: NewsFilter) => void;
   onArticleChange?: (article: DashboardArticle | undefined) => void;
   showFilters?: boolean;
+  density?: "comfortable" | "compact";
 };
 
 function formatDate(value: string) {
@@ -47,6 +48,7 @@ export default function NewsFeed({
   onFilterChange,
   onArticleChange,
   showFilters = false,
+  density = "comfortable",
 }: NewsFeedProps) {
   const [articles, setArticles] = useState(initialArticles);
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -225,7 +227,7 @@ export default function NewsFeed({
             type="button"
             aria-pressed={safeIndex === index}
             onClick={() => setSelectedIndex(index)}
-            className={`group w-[260px] shrink-0 snap-start rounded-2xl border p-4 text-left transition sm:w-[300px] ${
+            className={`group shrink-0 snap-start rounded-2xl border text-left transition ${density === "compact" ? "w-[220px] p-3 sm:w-[250px]" : "w-[260px] p-4 sm:w-[300px]"} ${
               safeIndex === index
                 ? "border-[var(--accent)] bg-[var(--accent-soft)] shadow-[var(--shadow-accent)]"
                 : "border-[var(--border)] bg-[var(--surface-soft)] hover:border-[var(--border-strong)]"
