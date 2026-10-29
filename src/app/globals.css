@@ -411,3 +411,7 @@ video {
 .mobile-navigation-panel .sidebar-label {
   display: inline;
 }
+
+.mobile-navigation-panel .sidebar-watchlist {
+  display: block;
+}
