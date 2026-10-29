@@ -20,6 +20,8 @@ jobs:
         run: npm ci
       - name: Run business logic tests
         run: npm test
+      - name: Run TypeScript check
+        run: npm run typecheck
       - name: Run ESLint
         run: npm run lint
       - name: Build production application
