@@ -405,3 +405,13 @@ video {
     border-top: 1px solid var(--border);
   }
 }
+
+
+/* Mobile navigation drawer keeps the same navigation labels visible on small screens. */
+.mobile-navigation-panel .sidebar-label {
+  display: inline;
+}
+
+.mobile-navigation-panel .sidebar-watchlist {
+  display: block;
+}

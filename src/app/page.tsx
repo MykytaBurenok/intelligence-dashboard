@@ -73,7 +73,6 @@ export default async function HomePage() {
       generatedAt={data.generatedAt}
       metrics={metrics}
       aiBrief={aiBrief}
-      quotes={data.quotes}
       brief={data.brief}
     />
   );

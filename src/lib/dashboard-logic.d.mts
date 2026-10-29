@@ -8,3 +8,10 @@ export function matchesNewsTopic(
   article: Pick<DashboardArticle, "title" | "description" | "source">,
   filter: "All news" | "Macro" | "Markets" | "Technology",
 ): boolean;
+
+export function getNewsPageMeta(
+  page: number,
+  pageSize: number,
+  totalResults: number,
+  articleCount: number,
+): { page: number; pageSize: number; totalResults: number; hasMore: boolean };

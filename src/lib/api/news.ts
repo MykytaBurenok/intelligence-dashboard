@@ -1,5 +1,5 @@
 import { requestJson, requireEnv } from "@/lib/api/client";
-import { normalizeNewsArticles } from "@/lib/dashboard-logic.mjs";
+import { getNewsPageMeta, normalizeNewsArticles } from "@/lib/dashboard-logic.mjs";
 import type { DashboardArticle } from "@/types/dashboard";
 
 type NewsApiArticle = {
@@ -7,25 +7,37 @@ type NewsApiArticle = {
   description?: string;
   url?: string;
   publishedAt?: string;
-  source?: {
-    name?: string;
-  };
+  source?: { name?: string };
 };
 
 type NewsApiResponse = {
   articles?: NewsApiArticle[];
   status?: string;
+  totalResults?: number;
 };
 
-type FetchNewsOptions = {
+export type FetchNewsPageOptions = {
   query?: string;
+  page?: number;
   pageSize?: number;
 };
 
-export async function fetchNews({
+export type NewsPage = {
+  articles: DashboardArticle[];
+  page: number;
+  pageSize: number;
+  totalResults: number;
+  hasMore: boolean;
+};
+
+export async function fetchNewsPage({
   query = "markets OR economy OR Federal Reserve OR inflation OR AI",
+  page = 1,
   pageSize = 8,
-}: FetchNewsOptions = {}): Promise<DashboardArticle[]> {
+}: FetchNewsPageOptions = {}): Promise<NewsPage> {
+  const safePage = Math.min(100, Math.max(1, Math.floor(page)));
+  const safePageSize = Math.min(100, Math.max(1, Math.floor(pageSize)));
+
   const data = await requestJson<NewsApiResponse>(
     "https://newsapi.org/v2/everything",
     {
@@ -35,11 +47,10 @@ export async function fetchNews({
         q: query,
         language: "en",
         sortBy: "publishedAt",
-        pageSize: Math.min(100, Math.max(1, Math.floor(pageSize))),
+        page: safePage,
+        pageSize: safePageSize,
       },
-      next: {
-        revalidate: 300,
-      },
+      next: { revalidate: 300 },
     },
   );
 
@@ -47,5 +58,19 @@ export async function fetchNews({
     throw new Error("NewsAPI returned an unsuccessful status");
   }
 
-  return normalizeNewsArticles(data.articles);
+  const articles = normalizeNewsArticles(data.articles);
+  const metadata = getNewsPageMeta(
+    safePage,
+    safePageSize,
+    typeof data.totalResults === "number" ? data.totalResults : articles.length,
+    articles.length,
+  );
+
+  return { articles, ...metadata };
+}
+
+export async function fetchNews(
+  options: FetchNewsPageOptions = {},
+): Promise<DashboardArticle[]> {
+  return (await fetchNewsPage(options)).articles;
 }
