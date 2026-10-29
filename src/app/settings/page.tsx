@@ -6,32 +6,28 @@ import type { AIBrief } from "@/types/dashboard";
 
 const aiBrief: AIBrief = {
   whatThisMeans:
-    "Settings controls the display layer, workspace behavior, and future personalization options.",
+    "This page currently documents planned workspace controls. The listed preferences are informational placeholders and are not interactive settings yet.",
   keyTakeaways: [
-    "Theme state should stay accessible and easy to reach.",
-    "Workspace preferences can be grouped by display, alerts, and data.",
-    "This page is a good place for future account and API controls.",
+    "Theme controls are available through the theme switcher.",
+    "Alert thresholds and notification routing are not implemented.",
+    "API keys should be configured as deployment environment variables, not entered into this page.",
   ],
   featuredTitle: "Settings overview",
-  scenarios: [
-    { label: "Theme customization", probability: 72 },
-    { label: "Alert controls", probability: 51 },
-    { label: "Workspace sync", probability: 33 },
-  ],
+  scenarios: [],
 };
 
 const settingGroups = [
   {
     title: "Appearance",
-    items: ["Theme mode", "Density", "Card contrast"],
+    items: ["Theme mode: use the theme switcher", "Density: not implemented", "Card contrast: follows the selected theme"],
   },
   {
     title: "Signals",
-    items: ["Confidence threshold", "Priority topics", "Noise reduction"],
+    items: ["Confidence threshold: not implemented", "Priority topics: use dashboard filters", "Noise reduction: not implemented"],
   },
   {
     title: "Workspace",
-    items: ["Saved views", "Watch presets", "Notification routing"],
+    items: ["Saved views: not implemented", "Watchlist: stored in this browser", "Notification routing: not implemented"],
   },
 ];
 
@@ -49,8 +45,8 @@ export default function SettingsPage() {
             Settings
           </h1>
           <p className="mt-3 max-w-2xl text-sm leading-6 text-[var(--text-muted)]">
-            Manage dashboard behavior, visual preferences, and workspace-level
-            controls.
+            Available controls and planned preferences. Items marked not
+            implemented are informational only and do not change app behavior.
           </p>
         </section>
 
@@ -60,16 +56,16 @@ export default function SettingsPage() {
               <h2 className="text-lg font-semibold text-[var(--text)]">
                 {group.title}
               </h2>
-              <div className="mt-4 space-y-3">
+              <ul className="mt-4 space-y-3">
                 {group.items.map((item) => (
-                  <div
+                  <li
                     key={item}
                     className="rounded-xl border border-[var(--border)] bg-[var(--surface-soft)] px-3 py-3 text-sm text-[var(--text-muted)]"
                   >
                     {item}
-                  </div>
+                  </li>
                 ))}
-              </div>
+              </ul>
             </article>
           ))}
         </section>
