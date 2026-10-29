@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
+import { normalizeWatchlist } from "@/lib/dashboard-logic.mjs";
 
 type WatchlistContextValue = {
   items: string[];
@@ -21,14 +22,7 @@ export function WatchlistProvider({ children }: { children: React.ReactNode }) {
     try {
       const stored = window.localStorage.getItem(STORAGE_KEY);
       if (stored) {
-        const parsed: unknown = JSON.parse(stored);
-        if (Array.isArray(parsed)) {
-          setItems(
-            [...new Set(parsed.filter((item): item is string =>
-              typeof item === "string" && item.trim().length > 0
-            ))].slice(0, 100),
-          );
-        }
+        setItems(normalizeWatchlist(JSON.parse(stored)));
       }
     } catch {
       // Storage can be unavailable or contain invalid data; keep the in-memory list.
