@@ -550,7 +550,7 @@ body::after {
 }
 
 .shell-grid {
-  --sidebar-size: 260px;
+  --sidebar-size: 88px;
   --right-panel-size: 320px;
   grid-template-columns: minmax(0, 1fr);
 }
@@ -958,7 +958,7 @@ button:active:not(:disabled) { transform: scale(.985); }
   .shell-resize-handle--left { display: block; }
 }
 @media (min-width: 1280px) {
-  .shell-grid { grid-template-columns: var(--sidebar-size, 260px) minmax(0, 1fr) var(--right-panel-size, 320px); }
+  .shell-grid { --sidebar-size: 260px; grid-template-columns: var(--sidebar-size, 260px) minmax(0, 1fr) var(--right-panel-size, 320px); }
   .shell-resize-handle--right { display: block; }
   .shell-right-panel {
     position: sticky; top: 0; align-self: start;
