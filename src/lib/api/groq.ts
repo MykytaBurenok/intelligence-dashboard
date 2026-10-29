@@ -119,3 +119,44 @@ export async function generateDashboardBrief({
 
   return parseBrief(data.choices?.[0]?.message?.content ?? "", articles);
 }
+
+export async function generateArticleBrief(article: DashboardArticle): Promise<DashboardBrief> {
+  const fallback: DashboardBrief = {
+    headline: article.title,
+    summary: article.description || "The publisher did not provide a description for this story.",
+    takeaways: article.description ? [article.description.slice(0, 500)] : [],
+    confidence: 0,
+  };
+
+  try {
+    const data = await requestJson<GroqChatResponse>(
+      "https://api.groq.com/openai/v1/chat/completions",
+      {
+        apiName: "Groq",
+        method: "POST",
+        headers: {
+          Authorization: "Bearer " + requireEnv("GROQ_API_KEY"),
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: process.env.GROQ_MODEL ?? "llama-3.1-8b-instant",
+          messages: [
+            {
+              role: "system",
+              content: "Analyze exactly one news article for a market intelligence dashboard. Return only JSON with headline, summary, takeaways, and confidence. Use only the supplied title, publisher, date, and description. Do not claim you read the full article URL. Separate reported facts from possible implications. Never invent prices, outcomes, statistics, or causal links. If the supplied description is insufficient, say so. Takeaways must be grounded in the supplied text. Confidence is subjective confidence in summary faithfulness, not a calibrated probability or investment recommendation.",
+            },
+            { role: "user", content: JSON.stringify({ article }) },
+          ],
+          temperature: 0.2,
+          response_format: { type: "json_object" },
+        }),
+        cache: "no-store",
+      },
+    );
+
+    const parsed = parseBrief(data.choices?.[0]?.message?.content ?? "", [article]);
+    return { ...parsed, headline: article.title };
+  } catch {
+    return fallback;
+  }
+}
