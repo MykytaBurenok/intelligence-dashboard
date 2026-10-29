@@ -747,3 +747,82 @@ textarea:focus-visible {
     transition: none !important;
   }
 }
+
+
+/* Ambient depth layer: slow, low-contrast light that stays behind the workspace. */
+body { isolation: isolate; background-attachment: fixed; }
+body::before, body::after { position: fixed; inset: -18%; z-index: -1; pointer-events: none; content: ""; }
+body::before {
+  background:
+    radial-gradient(ellipse at 18% 28%, color-mix(in srgb, var(--accent) 14%, transparent), transparent 34%),
+    radial-gradient(ellipse at 78% 22%, color-mix(in srgb, var(--accent-2) 13%, transparent), transparent 31%),
+    radial-gradient(ellipse at 62% 82%, color-mix(in srgb, var(--accent-3) 8%, transparent), transparent 35%);
+  filter: blur(28px); opacity: 0.8; animation: ambient-drift 28s ease-in-out infinite alternate;
+}
+body::after {
+  inset: 0;
+  background-image: radial-gradient(rgba(255,255,255,.16) .65px, transparent .65px);
+  background-size: 5px 5px; opacity: .08;
+  mask-image: linear-gradient(180deg, black, transparent 90%);
+}
+@keyframes ambient-drift {
+  0% { transform: translate3d(-1.5%, -1%, 0) scale(1); }
+  50% { transform: translate3d(1.5%, 1%, 0) scale(1.04); }
+  100% { transform: translate3d(-.5%, 2%, 0) scale(1.02); }
+}
+.shell-frame { position: relative; z-index: 1; }
+.shell-grid { --sidebar-size: 260px; --right-panel-size: 320px; grid-template-columns: minmax(0, 1fr); }
+.shell-sidebar, .shell-right-panel { position: relative; transition: width 220ms cubic-bezier(.2,.7,.2,1), background-color 220ms ease; }
+.shell-sidebar { overflow-x: hidden; }
+.shell-resize-handle {
+  position: absolute; z-index: 25; top: 0; bottom: 0; display: none; width: 9px; padding: 0;
+  border: 0; background: transparent; cursor: col-resize; touch-action: none; outline-offset: -2px;
+}
+.shell-resize-handle::before {
+  position: absolute; top: 0; bottom: 0; left: 4px; width: 1px; background: transparent;
+  content: ""; transition: background-color 180ms ease, box-shadow 180ms ease;
+}
+.shell-resize-handle:hover::before, .shell-resize-handle:focus-visible::before, .shell-resize-handle[aria-valuenow]::before {
+  background: var(--accent); box-shadow: 0 0 14px color-mix(in srgb, var(--accent) 65%, transparent);
+}
+.shell-resize-handle--left { right: -5px; }
+.shell-resize-handle--right { left: -5px; }
+.shell-resize-handle:active::before { width: 2px; left: 3px; }
+.shell-frame.is-resizing, .shell-frame.is-resizing * { cursor: col-resize !important; user-select: none !important; }
+.shell-main > *:nth-child(1) { animation-delay: 35ms; }
+.shell-main > *:nth-child(2) { animation-delay: 85ms; }
+.shell-main > *:nth-child(3) { animation-delay: 135ms; }
+.shell-main > *:nth-child(4) { animation-delay: 185ms; }
+.shell-main > *:nth-child(5) { animation-delay: 235ms; }
+.card, .panel { position: relative; overflow: hidden; isolation: isolate; }
+.card::after, .panel::after {
+  position: absolute; inset: 0; z-index: -1; border-radius: inherit;
+  background: linear-gradient(115deg, transparent 15%, color-mix(in srgb, var(--accent) 7%, transparent) 45%, transparent 75%);
+  opacity: 0; pointer-events: none; content: ""; transform: translateX(-18%);
+  transition: opacity 240ms ease, transform 480ms cubic-bezier(.2,.7,.2,1);
+}
+.card:hover::after, .panel:hover::after { opacity: 1; transform: translateX(0); }
+input:focus-visible, select:focus-visible, textarea:focus-visible { box-shadow: 0 0 0 4px var(--accent-soft); }
+:where(*) { scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--accent) 42%, transparent) transparent; }
+::-webkit-scrollbar { width: 9px; height: 9px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  border: 2px solid transparent; border-radius: 999px;
+  background: color-mix(in srgb, var(--text-faint) 52%, transparent); background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:hover { background: color-mix(in srgb, var(--accent) 68%, transparent); background-clip: padding-box; }
+::-webkit-scrollbar-corner { background: transparent; }
+@media (min-width: 768px) {
+  .shell-grid { grid-template-columns: var(--sidebar-size, 88px) minmax(0, 1fr); }
+  .shell-resize-handle--left { display: block; }
+}
+@media (min-width: 1280px) {
+  .shell-grid { grid-template-columns: var(--sidebar-size, 260px) minmax(0, 1fr) var(--right-panel-size, 320px); }
+  .shell-resize-handle--right { display: block; }
+}
+@media (max-width: 1279px) { .shell-right-panel { min-width: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  body::before { animation: none; }
+  .shell-resize-handle, .shell-sidebar, .shell-right-panel { transition: none !important; }
+  .card::after, .panel::after { transition: none !important; }
+}
