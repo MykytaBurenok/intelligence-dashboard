@@ -13,6 +13,7 @@ type NewsApiArticle = {
 
 type NewsApiResponse = {
   articles?: NewsApiArticle[];
+  status?: string;
 };
 
 type FetchNewsOptions = {
@@ -33,7 +34,7 @@ export async function fetchNews({
         q: query,
         language: "en",
         sortBy: "publishedAt",
-        pageSize,
+        pageSize: Math.min(100, Math.max(1, Math.floor(pageSize))),
       },
       next: {
         revalidate: 300,
@@ -41,13 +42,27 @@ export async function fetchNews({
     },
   );
 
-  return (data.articles ?? [])
-    .filter((article) => article.title && article.url)
+  if (data.status && data.status !== "ok") {
+    throw new Error("NewsAPI returned an unsuccessful status");
+  }
+
+  return (Array.isArray(data.articles) ? data.articles : [])
+    .filter(
+      (article) =>
+        typeof article.title === "string" &&
+        article.title.trim().length > 0 &&
+        typeof article.url === "string" &&
+        article.url.trim().length > 0,
+    )
     .map((article) => ({
-      title: article.title ?? "",
-      source: article.source?.name ?? "Unknown source",
-      url: article.url ?? "",
-      publishedAt: article.publishedAt ?? new Date().toISOString(),
-      description: article.description ?? "",
+      title: article.title!.trim(),
+      source: article.source?.name?.trim() || "Unknown source",
+      url: article.url!,
+      publishedAt:
+        typeof article.publishedAt === "string" &&
+        !Number.isNaN(Date.parse(article.publishedAt))
+          ? article.publishedAt
+          : "",
+      description: typeof article.description === "string" ? article.description : "",
     }));
 }
