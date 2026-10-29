@@ -1,5 +1,5 @@
 import "./globals.css";
-import { WatchlistProvider } from "@/components/providers/WatchlistProvider";
+import { WatchlistProvider } from "@/components/providers/WatchlistProvider";\nimport ScrollReset from "@/components/layout/ScrollReset";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
