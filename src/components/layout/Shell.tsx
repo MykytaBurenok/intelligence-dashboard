@@ -16,7 +16,8 @@ const MAX_RIGHT_PANEL = 460;
 export default function Shell({ sidebar, header, rightPanel, children }: ShellProps) {
   const [sidebarWidth, setSidebarWidth] = useState<number | null>(null);
   const [rightPanelWidth, setRightPanelWidth] = useState<number | null>(null);
-  const [isResizing, setIsResizing] = useState(false);\n  const shellRef = useRef<HTMLDivElement>(null);
+  const [isResizing, setIsResizing] = useState(false);
+  const shellRef = useRef<HTMLDivElement>(null);
   const resizeSession = useRef<ResizeSession | null>(null);
 
   useEffect(() => {
