@@ -5,7 +5,7 @@ A market and news monitoring dashboard built with Next.js, React, TypeScript, an
 ## Current capabilities
 
 - Market quotes from Finnhub for a configurable list of symbols.
-- Historical daily closing-price charts for SPY, QQQ, GLD, and USO over 1M, 3M, and 1Y ranges, sourced from Finnhub candles.
+- Historical daily closing-price charts for SPY, QQQ, GLD, and USO over 1M, 3M, and 1Y ranges, using Finnhub with Yahoo Finance as a fallback.
 - News articles from NewsAPI.
 - A compact AI-generated summary from Groq when configured.
 - A horizontally scrollable news feed with selected-story details, story pagination, and provider-backed page loading.
@@ -23,7 +23,7 @@ A market and news monitoring dashboard built with Next.js, React, TypeScript, an
 ## Data integrity notes
 
 - Market values and articles are shown only when valid responses are returned by their providers.
-- Historical charts use Finnhub daily candle close values, not generated or interpolated sample data. Unsupported symbols, provider errors, and insufficient observations produce an unavailable state.
+- Historical charts use daily candle close values from Finnhub, with Yahoo Finance as a fallback. The chart never generates or interpolates sample prices. If both providers fail or return insufficient observations, the chart shows an unavailable state.
 - Market Snapshot cards are global quotes and are not expected to change when a news story is selected.
 - The selected-story analysis updates when the selected article changes and uses its title and description as context.
 - The AI analysis does not fetch or verify the full linked article page. Its conclusions are limited to metadata and description supplied by the news provider.
@@ -84,7 +84,7 @@ Core dashboard rules, including news pagination boundaries, have automated unit 
 ## Architecture
 
 - `src/app`: Next.js App Router pages and API routes.
-- `src/app/api/market/history/route.ts`: validated, cached historical candle endpoint for the chart.
+- `src/app/api/market/history/route.ts`: validated, cached historical candle endpoint with Finnhub and Yahoo Finance fallback.
 - `src/components/markets/HistoricalMarketChart.tsx`: interactive client-side SVG chart and period statistics.
 - `src/components`: dashboard shell, cards, navigation, and client-side interactions.
 - `src/lib/api`: external provider clients and request handling.
