@@ -61,9 +61,11 @@ export default function HomeDashboardClient({
   const [query, setQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState<NewsFilter>("All news");
   const [selectedArticle, setSelectedArticle] = useState<DashboardArticle>();
-  const [articleBrief, setArticleBrief] = useState<AIBrief>(aiBrief);
-  const [isAnalyzingArticle, setIsAnalyzingArticle] = useState(false);
-  const [analysisError, setAnalysisError] = useState("");
+  const [articleAnalysis, setArticleAnalysis] = useState<{
+    articleUrl: string;
+    brief: AIBrief;
+    error?: string;
+  }>();
   const [density, setDensity] = useState<FeedDensity>("comfortable");
 
   useEffect(() => {
@@ -87,17 +89,13 @@ export default function HomeDashboardClient({
 
   const onArticleChange = useCallback((article: DashboardArticle | undefined) => {
     setSelectedArticle(article);
-    if (article) {
-      setArticleBrief(articleFallback(article));
-      setIsAnalyzingArticle(true);
-      setAnalysisError("");
-    }
   }, []);
 
   useEffect(() => {
     if (!selectedArticle) return;
 
     const controller = new AbortController();
+
     fetch("/api/article-brief", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -109,18 +107,31 @@ export default function HomeDashboardClient({
         if (!response.ok) throw new Error(payload.error || "Article analysis is temporarily unavailable.");
         return payload;
       })
-      .then((payload) => setArticleBrief(toAIBrief(payload)))
+      .then((payload) => {
+        if (!controller.signal.aborted) {
+          setArticleAnalysis({ articleUrl: selectedArticle.url, brief: toAIBrief(payload) });
+        }
+      })
       .catch((error: unknown) => {
         if (error instanceof Error && error.name === "AbortError") return;
-        setAnalysisError("AI analysis is unavailable. Showing the publisher-provided description instead.");
-      })
-      .finally(() => {
-        if (!controller.signal.aborted) setIsAnalyzingArticle(false);
+        if (!controller.signal.aborted) {
+          setArticleAnalysis({
+            articleUrl: selectedArticle.url,
+            brief: articleFallback(selectedArticle),
+            error: "AI analysis is unavailable. Showing the publisher-provided description instead.",
+          });
+        }
       });
 
     return () => controller.abort();
   }, [selectedArticle]);
 
+  const currentArticleAnalysis = selectedArticle && articleAnalysis?.articleUrl === selectedArticle.url
+    ? articleAnalysis
+    : undefined;
+  const articleBrief = selectedArticle
+    ? currentArticleAnalysis?.brief ?? articleFallback(selectedArticle)
+    : aiBrief;
   const shareTitle = selectedArticle?.title ?? brief.headline;
   const shareUrl = selectedArticle?.url;
 
@@ -145,7 +156,13 @@ export default function HomeDashboardClient({
           shareUrl={shareUrl}
         />
       }
-      rightPanel={<ScenarioCard aiBrief={articleBrief} isLoading={isAnalyzingArticle} analysisError={analysisError} />}
+      rightPanel={
+        <ScenarioCard
+          aiBrief={articleBrief}
+          isLoading={Boolean(selectedArticle && !currentArticleAnalysis)}
+          analysisError={currentArticleAnalysis?.error}
+        />
+      }
     >
       <div className="mx-auto max-w-[1120px] space-y-7">
         <section className="flex flex-col gap-4 border-b border-[var(--border)] pb-6 sm:flex-row sm:items-end sm:justify-between">
