@@ -24,6 +24,7 @@ export default function SettingsClient() {
   const [defaultFilter, setDefaultFilter] = useState<NewsFilter>("All news");
   const [density, setDensity] = useState<Density>("comfortable");
   const [saved, setSaved] = useState(false);
+  const [saveError, setSaveError] = useState("");
   const { items, removeItem } = useWatchlist();
 
   useEffect(() => {
@@ -34,11 +35,17 @@ export default function SettingsClient() {
   }, []);
 
   function savePreferences(nextFilter = defaultFilter, nextDensity = density) {
-    window.localStorage.setItem(DEFAULT_FILTER_KEY, nextFilter);
-    window.localStorage.setItem(DENSITY_KEY, nextDensity);
-    window.dispatchEvent(new Event(PREFERENCES_EVENT));
-    setSaved(true);
-    window.setTimeout(() => setSaved(false), 2200);
+    try {
+      window.localStorage.setItem(DEFAULT_FILTER_KEY, nextFilter);
+      window.localStorage.setItem(DENSITY_KEY, nextDensity);
+      window.dispatchEvent(new Event(PREFERENCES_EVENT));
+      setSaveError("");
+      setSaved(true);
+      window.setTimeout(() => setSaved(false), 2200);
+    } catch {
+      setSaved(false);
+      setSaveError("Browser storage is unavailable. Preferences could not be saved.");
+    }
   }
 
   function resetPreferences() {
@@ -107,6 +114,7 @@ export default function SettingsClient() {
             Reset to defaults
           </button>
           {saved ? <span className="text-sm text-[var(--success)]" role="status">Preferences saved</span> : null}
+          {saveError ? <span className="text-sm text-[var(--danger)]" role="alert">{saveError}</span> : null}
         </div>
       </section>
 
