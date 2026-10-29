@@ -1,4 +1,5 @@
 import { requestJson, requireEnv } from "@/lib/api/client";
+import { normalizeNewsArticles } from "@/lib/dashboard-logic.mjs";
 import type { DashboardArticle } from "@/types/dashboard";
 
 type NewsApiArticle = {
@@ -13,6 +14,7 @@ type NewsApiArticle = {
 
 type NewsApiResponse = {
   articles?: NewsApiArticle[];
+  status?: string;
 };
 
 type FetchNewsOptions = {
@@ -33,7 +35,7 @@ export async function fetchNews({
         q: query,
         language: "en",
         sortBy: "publishedAt",
-        pageSize,
+        pageSize: Math.min(100, Math.max(1, Math.floor(pageSize))),
       },
       next: {
         revalidate: 300,
@@ -41,13 +43,9 @@ export async function fetchNews({
     },
   );
 
-  return (data.articles ?? [])
-    .filter((article) => article.title && article.url)
-    .map((article) => ({
-      title: article.title ?? "",
-      source: article.source?.name ?? "Unknown source",
-      url: article.url ?? "",
-      publishedAt: article.publishedAt ?? new Date().toISOString(),
-      description: article.description ?? "",
-    }));
+  if (data.status && data.status !== "ok") {
+    throw new Error("NewsAPI returned an unsuccessful status");
+  }
+
+  return normalizeNewsArticles(data.articles);
 }

@@ -10,6 +10,19 @@ type NewsSwitcherProps = {
   onChange?: (index: number) => void;
 };
 
+function formatPublishedAt(value: string) {
+  if (!value) return "Publication time unavailable";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Publication time unavailable";
+
+  return date.toLocaleString("en-US", {
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
 export default function NewsSwitcher({
   articles,
   activeIndex,
@@ -19,7 +32,7 @@ export default function NewsSwitcher({
 
   if (!articles.length) {
     return (
-      <div className="mt-3 text-sm text-[var(--text-muted)]">
+      <div className="mt-3 text-sm text-[var(--text-muted)]" role="status">
         No news available right now.
       </div>
     );
@@ -30,7 +43,7 @@ export default function NewsSwitcher({
     typeof activeIndex === "number" && typeof onChange === "function";
 
   const currentIndex = isControlled ? activeIndex : internalIndex;
-  const safeIndex = Math.min(currentIndex, visibleArticles.length - 1);
+  const safeIndex = Math.min(Math.max(0, currentIndex), visibleArticles.length - 1);
   const activeArticle = visibleArticles[safeIndex];
 
   function handleChange(index: number) {
@@ -44,11 +57,12 @@ export default function NewsSwitcher({
 
   return (
     <div className="mt-3">
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-2" aria-label="Choose article">
         {visibleArticles.map((article, index) => (
           <button
             key={`${article.title}-${index}`}
             type="button"
+            aria-pressed={safeIndex === index}
             onClick={() => handleChange(index)}
             className={`rounded-xl border px-3 py-2 text-xs font-semibold transition ${
               safeIndex === index
@@ -65,22 +79,15 @@ export default function NewsSwitcher({
         <h2 className="min-w-0 flex-1 text-lg font-semibold text-[var(--text)]">
           {activeArticle.title}
         </h2>
-
         <WatchButton item={activeArticle.title} />
       </div>
 
       <p className="mt-2 text-xs text-[var(--text-faint)]">
-        {activeArticle.source} ·{" "}
-        {new Date(activeArticle.publishedAt).toLocaleString("en-US", {
-          month: "short",
-          day: "numeric",
-          hour: "2-digit",
-          minute: "2-digit",
-        })}
+        {activeArticle.source} · {formatPublishedAt(activeArticle.publishedAt)}
       </p>
 
       <p className="mt-3 text-sm leading-6 text-[var(--text-muted)]">
-        {activeArticle.description ?? "No description available."}
+        {activeArticle.description || "No description available."}
       </p>
 
       <a

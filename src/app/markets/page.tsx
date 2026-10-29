@@ -8,9 +8,9 @@ function formatMove(value: number) {
 }
 
 function getBias(value: number) {
-  if (value > 0.5) return "Strengthening";
-  if (value < -0.5) return "Weakening";
-  return "Neutral";
+  if (value > 0.5) return "Positive daily move";
+  if (value < -0.5) return "Negative daily move";
+  return "Near-flat daily move";
 }
 
 export default async function MarketsPage() {
@@ -57,7 +57,7 @@ export default async function MarketsPage() {
               />
             </div>
             <p className="mt-4 text-xs text-[var(--text-faint)]">
-              Bias: {getBias(quote.percentChange)}
+              Daily move: {getBias(quote.percentChange)}
             </p>
           </article>
         ))}

@@ -5,10 +5,7 @@ export function buildAIBrief(data: DashboardData): AIBrief {
     whatThisMeans: data.brief.summary,
     keyTakeaways: data.brief.takeaways,
     featuredTitle: data.brief.headline,
-    scenarios: [
-      { label: "Delayed cuts", probability: 58 },
-      { label: "Soft landing", probability: 34 },
-      { label: "Recession risk", probability: 8 },
-    ],
+    // Probabilities must come from a calibrated model, not hardcoded demo values.
+    scenarios: [],
   };
 }

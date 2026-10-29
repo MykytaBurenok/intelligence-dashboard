@@ -1,4 +1,5 @@
-import { requestJson, requireEnv } from "@/lib/api/client";
+import { ApiClientError, requestJson, requireEnv } from "@/lib/api/client";
+import { isValidFinnhubQuote } from "@/lib/dashboard-logic.mjs";
 import type { MarketQuote } from "@/types/dashboard";
 
 type FinnhubQuoteResponse = {
@@ -23,17 +24,22 @@ export async function fetchQuote(symbol: string): Promise<MarketQuote> {
     },
   );
 
+  if (!isValidFinnhubQuote(data)) {
+    throw new ApiClientError(`Finnhub returned no valid quote for ${symbol}`);
+  }
+
   return {
     symbol,
-    current: data.c ?? 0,
-    change: data.d ?? 0,
-    percentChange: data.dp ?? 0,
-    previousClose: data.pc ?? 0,
+    current: data.c!,
+    change: data.d!,
+    percentChange: data.dp!,
+    previousClose: data.pc!,
   };
 }
 
 export async function fetchMarketQuotes(
   symbols = ["SPY", "QQQ", "GLD", "USO"],
-) {
-  return Promise.all(symbols.map((symbol) => fetchQuote(symbol)));
+): Promise<MarketQuote[]> {
+  const results = await Promise.allSettled(symbols.map((symbol) => fetchQuote(symbol)));
+  return results.flatMap((result) => result.status === "fulfilled" ? [result.value] : []);
 }

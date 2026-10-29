@@ -12,6 +12,8 @@ export default function WatchButton({ item }: WatchButtonProps) {
 
   return (
     <button
+      type="button"
+      aria-pressed={watched}
       onClick={() => toggleItem(item)}
       className={`shrink-0 rounded-xl border px-3 py-2 text-sm font-medium transition ${
         watched

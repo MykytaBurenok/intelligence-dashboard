@@ -3,6 +3,7 @@ type QueryValue = string | number | boolean | null | undefined;
 type RequestJsonOptions = RequestInit & {
   apiName: string;
   query?: Record<string, QueryValue>;
+  timeoutMs?: number;
 };
 
 export class ApiClientError extends Error {
@@ -16,7 +17,7 @@ export class ApiClientError extends Error {
 }
 
 export function requireEnv(name: string): string {
-  const value = process.env[name];
+  const value = process.env[name]?.trim();
 
   if (!value) {
     throw new ApiClientError(`Missing required environment variable: ${name}`);
@@ -42,25 +43,55 @@ export function createUrl(
 
 export async function requestJson<T>(
   baseUrl: string,
-  { apiName, query, headers, ...init }: RequestJsonOptions,
+  { apiName, query, headers, timeoutMs = 10_000, signal, ...init }: RequestJsonOptions,
 ): Promise<T> {
-  const response = await fetch(createUrl(baseUrl, query), {
-    ...init,
-    headers: {
-      Accept: "application/json",
-      ...headers,
-    },
-  });
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+  const abortFromCaller = () => controller.abort();
 
-  if (!response.ok) {
-    const body = await response.text().catch(() => "");
-    const detail = body ? `: ${body.slice(0, 240)}` : "";
-
-    throw new ApiClientError(
-      `${apiName} request failed with ${response.status}${detail}`,
-      response.status,
-    );
+  if (signal?.aborted) {
+    controller.abort();
+  } else {
+    signal?.addEventListener("abort", abortFromCaller, { once: true });
   }
 
-  return (await response.json()) as T;
+  try {
+    const response = await fetch(createUrl(baseUrl, query), {
+      ...init,
+      signal: controller.signal,
+      headers: {
+        Accept: "application/json",
+        ...headers,
+      },
+    });
+
+    if (!response.ok) {
+      // Do not echo arbitrary upstream response bodies into server logs or UI errors.
+      throw new ApiClientError(
+        `${apiName} request failed with HTTP ${response.status}`,
+        response.status,
+      );
+    }
+
+    try {
+      return (await response.json()) as T;
+    } catch {
+      throw new ApiClientError(`${apiName} returned an invalid JSON response`, response.status);
+    }
+  } catch (error) {
+    if (error instanceof ApiClientError) throw error;
+
+    if (controller.signal.aborted) {
+      throw new ApiClientError(
+        signal?.aborted
+          ? `${apiName} request was cancelled`
+          : `${apiName} request timed out after ${timeoutMs}ms`,
+      );
+    }
+
+    throw new ApiClientError(`${apiName} request failed due to a network error`);
+  } finally {
+    clearTimeout(timeout);
+    signal?.removeEventListener("abort", abortFromCaller);
+  }
 }
