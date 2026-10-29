@@ -60,12 +60,14 @@ The app degrades to unavailable/empty data when a provider cannot be reached, so
 
 ```bash
 npm run dev    # Start local development
+npm test       # Run business logic unit tests
+npm run typecheck # Check TypeScript types
 npm run lint   # Run ESLint
 npm run build  # Create a production build
 npm run start  # Serve a production build
 ```
 
-There is currently no dedicated automated test script configured in `package.json`.
+Core dashboard rules have automated unit tests using Node.js built-in test runner. Run `npm test` to execute them and `npm run typecheck` to check TypeScript types. GitHub Actions runs tests, type checking, lint, and a production build for pull requests and pushes to `main`.
 
 ## Architecture
 
