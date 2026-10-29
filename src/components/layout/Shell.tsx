@@ -8,15 +8,15 @@ type ShellProps = { sidebar: ReactNode; header: ReactNode; rightPanel: ReactNode
 type ResizeTarget = "left" | "right";
 type ResizeSession = { target: ResizeTarget; startX: number; startWidth: number };
 
-const MIN_SIDEBAR = 208;
-const MAX_SIDEBAR = 360;
-const MIN_RIGHT_PANEL = 260;
-const MAX_RIGHT_PANEL = 440;
+const MIN_SIDEBAR = 224;
+const MAX_SIDEBAR = 400;
+const MIN_RIGHT_PANEL = 280;
+const MAX_RIGHT_PANEL = 460;
 
 export default function Shell({ sidebar, header, rightPanel, children }: ShellProps) {
   const [sidebarWidth, setSidebarWidth] = useState<number | null>(null);
   const [rightPanelWidth, setRightPanelWidth] = useState<number | null>(null);
-  const [isResizing, setIsResizing] = useState(false);
+  const [isResizing, setIsResizing] = useState(false);\n  const shellRef = useRef<HTMLDivElement>(null);
   const resizeSession = useRef<ResizeSession | null>(null);
 
   useEffect(() => {
@@ -27,6 +27,24 @@ export default function Shell({ sidebar, header, rightPanel, children }: ShellPr
       if (Number.isFinite(savedRight) && savedRight >= MIN_RIGHT_PANEL && savedRight <= MAX_RIGHT_PANEL) setRightPanelWidth(savedRight);
     });
     return () => window.cancelAnimationFrame(frame);
+  }, []);
+
+  useEffect(() => {
+    const root = shellRef.current;
+    if (!root || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    let frame = 0;
+    const handleMove = (event: PointerEvent) => {
+      if (frame) window.cancelAnimationFrame(frame);
+      frame = window.requestAnimationFrame(() => {
+        root.style.setProperty("--pointer-x", `${event.clientX - window.innerWidth / 2}px`);
+        root.style.setProperty("--pointer-y", `${event.clientY - window.innerHeight / 2}px`);
+      });
+    };
+    window.addEventListener("pointermove", handleMove, { passive: true });
+    return () => {
+      window.removeEventListener("pointermove", handleMove);
+      if (frame) window.cancelAnimationFrame(frame);
+    };
   }, []);
 
   const finishResize = useCallback(() => {
@@ -76,12 +94,12 @@ export default function Shell({ sidebar, header, rightPanel, children }: ShellPr
   } as CSSProperties;
 
   return (
-    <div className={`shell-frame${isResizing ? " is-resizing" : ""}`}>
+    <div ref={shellRef} className={`shell-frame${isResizing ? " is-resizing" : ""}`}>
       <div className="shell-grid" style={gridStyle}>
         <aside className="shell-sidebar" aria-label="Desktop sidebar">
           {sidebar}
           <button type="button" className="shell-resize-handle shell-resize-handle--left"
-            aria-label="Resize navigation sidebar. Use arrow keys to adjust, double click to reset."
+            aria-label="Resize navigation sidebar. Use arrow keys to adjust, double click to reset." role="separator" aria-orientation="vertical" aria-valuemin={MIN_SIDEBAR} aria-valuemax={MAX_SIDEBAR} aria-valuenow={sidebarWidth ?? (typeof window !== "undefined" && window.matchMedia("(min-width: 1280px)").matches ? 260 : 88)}
             onPointerDown={(event) => handlePointerDown("left", event)} onPointerMove={handlePointerMove}
             onPointerUp={finishResize} onPointerCancel={finishResize} onDoubleClick={() => resetWidth("left")}
             onKeyDown={(event) => {
@@ -112,7 +130,7 @@ export default function Shell({ sidebar, header, rightPanel, children }: ShellPr
 
         <aside className="shell-right-panel" aria-label="AI briefing and scenario notes">
           <button type="button" className="shell-resize-handle shell-resize-handle--right"
-            aria-label="Resize intelligence panel. Use arrow keys to adjust, double click to reset."
+            aria-label="Resize intelligence panel. Use arrow keys to adjust, double click to reset." role="separator" aria-orientation="vertical" aria-valuemin={MIN_RIGHT_PANEL} aria-valuemax={MAX_RIGHT_PANEL} aria-valuenow={rightPanelWidth ?? 320}
             onPointerDown={(event) => handlePointerDown("right", event)} onPointerMove={handlePointerMove}
             onPointerUp={finishResize} onPointerCancel={finishResize} onDoubleClick={() => resetWidth("right")}
             onKeyDown={(event) => {
