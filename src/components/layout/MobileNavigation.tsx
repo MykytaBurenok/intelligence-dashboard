@@ -21,7 +21,7 @@ export default function MobileNavigation({ children }: { children: React.ReactNo
       {open ? (
         <div
           id="mobile-navigation-panel"
-          className="fixed inset-x-0 bottom-0 top-[62px] z-40 overflow-y-auto border-t border-[var(--border)] bg-[var(--bg)]/95 p-4 backdrop-blur-2xl md:hidden"
+          className="mobile-navigation-panel fixed inset-x-0 bottom-0 top-[62px] z-40 overflow-y-auto border-t border-[var(--border)] bg-[var(--bg)]/95 p-4 backdrop-blur-2xl md:hidden"
         >
           <div className="mx-auto max-w-xl" onClick={() => setOpen(false)}>
             {children}
