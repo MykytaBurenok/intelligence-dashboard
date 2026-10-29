@@ -15,49 +15,53 @@ type MetricItem = {
 
 export default async function HomePage() {
   const data = await getDashboardData();
+  const primaryQuote = data.quotes[0];
+  const secondaryQuote = data.quotes[1];
 
   const metrics: MetricItem[] = [
     {
       label: "Market",
-      name: data.quotes[0]?.symbol ?? "DXY",
-      value: data.quotes[0] ? data.quotes[0].current.toFixed(2) : "—",
-      change: data.quotes[0]
-        ? `${data.quotes[0].percentChange >= 0 ? "+" : ""}${data.quotes[0].percentChange.toFixed(2)}%`
-        : "—",
-      description: "Dollar index reaction to macro policy shift.",
-      intensity: Math.min(
-        Math.abs(data.quotes[0]?.percentChange ?? 0) * 20,
-        100,
-      ),
+      name: primaryQuote?.symbol ?? "Market quote",
+      value: primaryQuote ? primaryQuote.current.toFixed(2) : "Unavailable",
+      change: primaryQuote
+        ? `${primaryQuote.percentChange > 0 ? "+" : ""}${primaryQuote.percentChange.toFixed(2)}%`
+        : "No live quote",
+      description: primaryQuote
+        ? "Latest quote returned by the market data provider."
+        : "Market data is currently unavailable. Check API configuration and provider status.",
+      intensity: primaryQuote
+        ? Math.min(Math.abs(primaryQuote.percentChange) * 20, 100)
+        : 0,
     },
     {
-      label: "Commodities",
-      name: data.quotes[1]?.symbol ?? "Gold",
-      value: data.quotes[1] ? data.quotes[1].current.toFixed(2) : "—",
-      change: data.quotes[1]
-        ? `${data.quotes[1].percentChange >= 0 ? "+" : ""}${data.quotes[1].percentChange.toFixed(2)}%`
-        : "—",
-      description: "Safe haven demand tracked against dollar moves.",
-      intensity: Math.min(
-        Math.abs(data.quotes[1]?.percentChange ?? 0) * 15,
-        100,
-      ),
+      label: "Commodities / ETF",
+      name: secondaryQuote?.symbol ?? "Secondary quote",
+      value: secondaryQuote ? secondaryQuote.current.toFixed(2) : "Unavailable",
+      change: secondaryQuote
+        ? `${secondaryQuote.percentChange > 0 ? "+" : ""}${secondaryQuote.percentChange.toFixed(2)}%`
+        : "No live quote",
+      description: secondaryQuote
+        ? "Latest quote returned by the market data provider."
+        : "No second quote is available from the market data provider.",
+      intensity: secondaryQuote
+        ? Math.min(Math.abs(secondaryQuote.percentChange) * 15, 100)
+        : 0,
     },
     {
-      label: "Narrative",
-      name: "Narrative strength",
-      value: `${data.brief.confidence}`,
-      change: "+0.9",
-      description: "Policy divergence cluster gaining cross-source support.",
-      intensity: data.brief.confidence,
+      label: "News",
+      name: "Fetched articles",
+      value: String(data.articles.length),
+      change: "Latest batch",
+      description: "Articles returned by the configured news provider for this request.",
+      intensity: Math.min(data.articles.length * 10, 100),
     },
     {
-      label: "Scenario",
-      name: data.brief.takeaways[0] ?? "Delayed-cut probability",
-      value: "58%",
-      change: "+11%",
-      description: "Consensus path shifts toward a longer hold window.",
-      intensity: 58,
+      label: "AI briefing",
+      name: "Model-reported confidence",
+      value: data.brief.confidence > 0 ? `${data.brief.confidence}%` : "Unavailable",
+      change: data.brief.confidence > 0 ? "Subjective estimate" : "No validated estimate",
+      description: "Self-reported model confidence, not a calibrated probability or investment signal.",
+      intensity: data.brief.confidence > 0 ? data.brief.confidence : 0,
     },
   ];
 
