@@ -1,5 +1,5 @@
 import { requestJson, requireEnv } from "@/lib/api/client";
-import { normalizeNewsArticles } from "@/lib/dashboard-logic.mjs";
+import { getNewsPageMeta, normalizeNewsArticles } from "@/lib/dashboard-logic.mjs";
 import type { DashboardArticle } from "@/types/dashboard";
 
 type NewsApiArticle = {
@@ -59,18 +59,14 @@ export async function fetchNewsPage({
   }
 
   const articles = normalizeNewsArticles(data.articles);
-  const totalResults =
-    typeof data.totalResults === "number" && Number.isFinite(data.totalResults)
-      ? Math.max(0, data.totalResults)
-      : articles.length;
+  const metadata = getNewsPageMeta(
+    safePage,
+    safePageSize,
+    typeof data.totalResults === "number" ? data.totalResults : articles.length,
+    articles.length,
+  );
 
-  return {
-    articles,
-    page: safePage,
-    pageSize: safePageSize,
-    totalResults,
-    hasMore: safePage * safePageSize < totalResults && articles.length > 0,
-  };
+  return { articles, ...metadata };
 }
 
 export async function fetchNews(
