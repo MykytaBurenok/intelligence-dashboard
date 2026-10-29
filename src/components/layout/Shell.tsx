@@ -82,7 +82,6 @@ export default function Shell({ sidebar, header, rightPanel, children }: ShellPr
           {sidebar}
           <button type="button" className="shell-resize-handle shell-resize-handle--left"
             aria-label="Resize navigation sidebar. Use arrow keys to adjust, double click to reset."
-            aria-orientation="vertical"
             onPointerDown={(event) => handlePointerDown("left", event)} onPointerMove={handlePointerMove}
             onPointerUp={finishResize} onPointerCancel={finishResize} onDoubleClick={() => resetWidth("left")}
             onKeyDown={(event) => {
@@ -114,7 +113,6 @@ export default function Shell({ sidebar, header, rightPanel, children }: ShellPr
         <aside className="shell-right-panel" aria-label="AI briefing and scenario notes">
           <button type="button" className="shell-resize-handle shell-resize-handle--right"
             aria-label="Resize intelligence panel. Use arrow keys to adjust, double click to reset."
-            aria-orientation="vertical"
             onPointerDown={(event) => handlePointerDown("right", event)} onPointerMove={handlePointerMove}
             onPointerUp={finishResize} onPointerCancel={finishResize} onDoubleClick={() => resetWidth("right")}
             onKeyDown={(event) => {
