@@ -51,21 +51,13 @@ export default function NewsFeed({
   density = "comfortable",
 }: NewsFeedProps) {
   const [articles, setArticles] = useState(initialArticles);
-  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [selectedUrl, setSelectedUrl] = useState(initialArticles[0]?.url ?? "");
   const [nextApiPage, setNextApiPage] = useState(2);
   const [hasMore, setHasMore] = useState(initialArticles.length >= PAGE_SIZE);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const stripRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef<Array<HTMLButtonElement | null>>([]);
-
-  useEffect(() => {
-    setArticles(initialArticles);
-    setSelectedIndex(0);
-    setNextApiPage(2);
-    setHasMore(initialArticles.length >= PAGE_SIZE);
-    setError("");
-  }, [initialArticles]);
 
   const filteredArticles = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
@@ -94,12 +86,8 @@ export default function NewsFeed({
     });
   }, [safeIndex]);
 
-  useEffect(() => {
-    setSelectedIndex(0);
-  }, [query, activeFilter]);
-
-  async function loadMore() {
-    if (isLoading || !hasMore) return;
+  async function loadMore(): Promise<DashboardArticle[]> {
+    if (isLoading || !hasMore) return [];
     setIsLoading(true);
     setError("");
     try {
@@ -109,15 +97,18 @@ export default function NewsFeed({
         throw new Error(payload.error || "Unable to load more news.");
       }
 
+      const knownUrls = new Set(articles.map((article) => article.url));
+      const added = payload.articles.filter((article) => !knownUrls.has(article.url));
       setArticles((current) => {
-        const knownUrls = new Set(current.map((article) => article.url));
-        return [...current, ...payload.articles.filter((article) => !knownUrls.has(article.url))];
+        const currentUrls = new Set(current.map((article) => article.url));
+        return [...current, ...added.filter((article) => !currentUrls.has(article.url))];
       });
-      setHasMore(payload.hasMore);
+      setHasMore(payload.hasMore && payload.articles.length > 0);
       setNextApiPage(payload.page + 1);
-      if (payload.articles.length === 0) setHasMore(false);
+      return added;
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Unable to load more news.");
+      return [];
     } finally {
       setIsLoading(false);
     }
@@ -125,15 +116,20 @@ export default function NewsFeed({
 
   async function moveSelection(direction: -1 | 1) {
     const nextIndex = safeIndex + direction;
-    if (nextIndex < 0) return;
-    if (nextIndex < filteredArticles.length) {
-      setSelectedIndex(nextIndex);
+    if (nextIndex >= 0 && nextIndex < filteredArticles.length) {
+      setSelectedUrl(filteredArticles[nextIndex].url);
       return;
     }
-    if (direction === 1 && hasMore) {
-      const previousLength = filteredArticles.length;
-      await loadMore();
-      setSelectedIndex(previousLength);
+    if (direction === 1 && hasMore && !isLoading) {
+      const added = await loadMore();
+      const normalizedQuery = query.trim().toLowerCase();
+      const nextArticle = added.find((article) => {
+        const searchable = [article.title, article.description, article.source]
+          .filter(Boolean).join(" ").toLowerCase();
+        return (!normalizedQuery || searchable.includes(normalizedQuery)) &&
+          matchesNewsTopic(article, activeFilter);
+      });
+      if (nextArticle) setSelectedUrl(nextArticle.url);
     }
   }
 
@@ -208,7 +204,7 @@ export default function NewsFeed({
             Change the topic or search term. More stories can also be loaded from the provider.
           </p>
           {hasMore ? (
-            <button type="button" onClick={loadMore} disabled={isLoading} className="premium-button mt-4 rounded-xl px-4 py-2 text-sm">
+            <button type="button" onClick={() => void loadMore()} disabled={isLoading} className="premium-button mt-4 rounded-xl px-4 py-2 text-sm">
               {isLoading ? "Loading…" : "Load more stories"}
             </button>
           ) : null}
@@ -225,10 +221,10 @@ export default function NewsFeed({
             key={article.url}
             ref={(node) => { cardRefs.current[index] = node; }}
             type="button"
-            aria-pressed={safeIndex === index}
-            onClick={() => setSelectedIndex(index)}
+            aria-pressed={activeArticle?.url === article.url}
+            onClick={() => setSelectedUrl(article.url)}
             className={`group shrink-0 snap-start rounded-2xl border text-left transition ${density === "compact" ? "w-[220px] p-3 sm:w-[250px]" : "w-[260px] p-4 sm:w-[300px]"} ${
-              safeIndex === index
+              activeArticle?.url === article.url
                 ? "border-[var(--accent)] bg-[var(--accent-soft)] shadow-[var(--shadow-accent)]"
                 : "border-[var(--border)] bg-[var(--surface-soft)] hover:border-[var(--border-strong)]"
             }`}
@@ -267,7 +263,7 @@ export default function NewsFeed({
                 type="button"
                 aria-label={`Select story ${currentPageStart + index + 1}`}
                 aria-current={pageDotIndex === index ? "page" : undefined}
-                onClick={() => setSelectedIndex(currentPageStart + index)}
+                onClick={() => setSelectedUrl(article.url)}
                 className={`h-2 rounded-full transition-all ${
                   pageDotIndex === index
                     ? "w-6 bg-[var(--accent)]"
@@ -304,7 +300,7 @@ export default function NewsFeed({
       {error ? (
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[var(--danger)]/30 bg-[var(--surface-soft)] p-3" role="alert">
           <p className="text-sm text-[var(--text-muted)]">{error}</p>
-          <button type="button" onClick={loadMore} disabled={isLoading} className="text-sm font-semibold text-[var(--accent)]">
+          <button type="button" onClick={() => void loadMore()} disabled={isLoading} className="text-sm font-semibold text-[var(--accent)]">
             Retry
           </button>
         </div>
