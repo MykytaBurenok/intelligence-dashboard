@@ -27,7 +27,6 @@ type HomeDashboardClientProps = {
   generatedAt: string;
   metrics: MetricItem[];
   aiBrief: AIBrief;
-  quotes: { symbol: string }[];
   brief: {
     headline: string;
     summary: string;
@@ -42,7 +41,6 @@ export default function HomeDashboardClient({
   generatedAt,
   metrics,
   aiBrief,
-  quotes,
   brief,
 }: HomeDashboardClientProps) {
   const [query, setQuery] = useState("");
