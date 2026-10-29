@@ -1,4 +1,5 @@
 import { ApiClientError, requestJson, requireEnv } from "@/lib/api/client";
+import { isValidFinnhubQuote } from "@/lib/dashboard-logic.mjs";
 import type { MarketQuote } from "@/types/dashboard";
 
 type FinnhubQuoteResponse = {
@@ -7,10 +8,6 @@ type FinnhubQuoteResponse = {
   dp?: number;
   pc?: number;
 };
-
-function finiteNumber(value: unknown): value is number {
-  return typeof value === "number" && Number.isFinite(value);
-}
 
 export async function fetchQuote(symbol: string): Promise<MarketQuote> {
   const data = await requestJson<FinnhubQuoteResponse>(
@@ -27,22 +24,16 @@ export async function fetchQuote(symbol: string): Promise<MarketQuote> {
     },
   );
 
-  if (
-    !finiteNumber(data.c) ||
-    !finiteNumber(data.d) ||
-    !finiteNumber(data.dp) ||
-    !finiteNumber(data.pc) ||
-    (data.c === 0 && data.pc === 0)
-  ) {
+  if (!isValidFinnhubQuote(data)) {
     throw new ApiClientError(`Finnhub returned no valid quote for ${symbol}`);
   }
 
   return {
     symbol,
-    current: data.c,
-    change: data.d,
-    percentChange: data.dp,
-    previousClose: data.pc,
+    current: data.c!,
+    change: data.d!,
+    percentChange: data.dp!,
+    previousClose: data.pc!,
   };
 }
 
