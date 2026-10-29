@@ -30,19 +30,23 @@ function formatUpdatedAt(value: string) {
 }
 
 export default function EventCard({ shift }: Props) {
+  const confidence = Number.isFinite(shift.impactScore)
+    ? Math.min(100, Math.max(0, shift.impactScore))
+    : 0;
+
   return (
     <section className="panel overflow-hidden p-5 sm:p-6 lg:p-7">
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="dashboard-kicker">Featured Shift</p>
+          <p className="dashboard-kicker">Featured News</p>
           <p className="mt-1 text-sm text-[var(--text-faint)]">
-            Updated {formatUpdatedAt(shift.updatedAt)} · macro policy cluster
+            Updated {formatUpdatedAt(shift.updatedAt)}
           </p>
         </div>
 
         <div className="flex flex-wrap gap-2">
           <div className="rounded-full border border-[var(--border)] bg-[var(--accent-soft)] px-3 py-1 text-xs font-semibold text-[var(--accent)]">
-            Confidence {shift.confidence}%
+            Model confidence {shift.confidence > 0 ? `${shift.confidence}%` : "unavailable"}
           </div>
           <div className="rounded-full border border-[var(--border)] bg-[var(--surface-soft)] px-3 py-1 text-xs font-semibold text-[var(--text-muted)]">
             Direction: {shift.direction}
@@ -67,8 +71,8 @@ export default function EventCard({ shift }: Props) {
             {shift.summary}
           </p>
 
-          <div className="mt-6 grid gap-4 md:grid-cols-2">
-            <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface-soft)] p-4">
+          {shift.affectedNarratives.length > 0 && (
+            <div className="mt-6 rounded-2xl border border-[var(--border)] bg-[var(--surface-soft)] p-4">
               <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--text-faint)]">
                 Affected Narratives
               </p>
@@ -83,55 +87,48 @@ export default function EventCard({ shift }: Props) {
                 ))}
               </div>
             </div>
+          )}
 
-            <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface-soft)] p-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--text-faint)]">
-                Affected Markets
-              </p>
-              <div className="mt-3 grid grid-cols-4 gap-2">
-                {shift.affectedMarkets.map((item) => (
-                  <span
-                    key={item}
-                    className="rounded-lg bg-[var(--surface-strong)] px-2 py-2 text-center text-xs font-semibold text-[var(--text)]"
-                  >
-                    {item}
-                  </span>
-                ))}
-              </div>
+          <div className="mt-6 rounded-2xl border border-[var(--border)] bg-[var(--surface-soft)] p-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--text-faint)]">
+              Market data available
+            </p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {shift.affectedMarkets.length ? shift.affectedMarkets.map((item) => (
+                <span
+                  key={item}
+                  className="rounded-lg bg-[var(--surface-strong)] px-3 py-2 text-xs font-semibold text-[var(--text)]"
+                >
+                  {item}
+                </span>
+              )) : (
+                <span className="text-sm text-[var(--text-muted)]">No live market quotes available.</span>
+              )}
             </div>
           </div>
         </div>
 
         <div className="card p-5">
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--text-faint)]">
-            Impact Score
+            Model-reported confidence
           </p>
           <div className="mt-4 flex items-end justify-between gap-3">
             <p className="text-5xl font-semibold text-[var(--text)]">
-              {shift.impactScore}
+              {shift.impactScore > 0 ? confidence : "—"}
             </p>
-            <p className="pb-2 text-sm font-semibold text-[var(--success)]">
-              +11
+            <p className="pb-2 text-sm font-medium text-[var(--text-muted)]">
+              {shift.impactScore > 0 ? "%" : "Unavailable"}
             </p>
           </div>
           <div className="mt-5 h-1.5 rounded-full bg-[var(--surface-strong)]">
             <div
               className="metric-line h-full rounded-full"
-              style={{ width: `${shift.impactScore}%` }}
+              style={{ width: `${shift.impactScore > 0 ? confidence : 0}%` }}
             />
           </div>
-          <div className="mt-5 grid h-14 grid-cols-6 items-end gap-1.5">
-            {[38, 56, 74, 69, 82, 77].map((height, index) => (
-              <div
-                key={index}
-                className="rounded-sm bg-[var(--accent)] opacity-70 transition-opacity hover:opacity-100"
-                style={{ height: `${height}%` }}
-              />
-            ))}
-          </div>
           <p className="mt-4 text-xs leading-5 text-[var(--text-muted)]">
-            Mini trend tracks narrative acceleration across policy-sensitive
-            assets over the latest session.
+            This is a subjective estimate returned by the language model, not a
+            statistically calibrated probability, historical trend, or trading recommendation.
           </p>
         </div>
       </div>
