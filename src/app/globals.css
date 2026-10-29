@@ -751,7 +751,7 @@ textarea:focus-visible {
 
 /* Ambient depth layer: slow, low-contrast light that stays behind the workspace. */
 body { isolation: isolate; background-attachment: fixed; }
-body::before, body::after { position: fixed; inset: -18%; z-index: -1; pointer-events: none; content: ""; }
+body::before, body::after { position: fixed; inset: -18%; z-index: 0; pointer-events: none; content: ""; }
 body::before {
   background:
     radial-gradient(ellipse at 18% 28%, color-mix(in srgb, var(--accent) 14%, transparent), transparent 34%),
@@ -813,12 +813,11 @@ input:focus-visible, select:focus-visible, textarea:focus-visible { box-shadow: 
 ::-webkit-scrollbar-thumb:hover { background: color-mix(in srgb, var(--accent) 68%, transparent); background-clip: padding-box; }
 ::-webkit-scrollbar-corner { background: transparent; }
 @media (min-width: 768px) {
-  .shell-grid { grid-template-columns: var(--sidebar-size, 88px) minmax(0, 1fr); }
-  .shell-resize-handle--left { display: block; }
+  .shell-grid { --sidebar-size: 88px; grid-template-columns: var(--sidebar-size, 88px) minmax(0, 1fr); }
 }
 @media (min-width: 1280px) {
-  .shell-grid { grid-template-columns: var(--sidebar-size, 260px) minmax(0, 1fr) var(--right-panel-size, 320px); }
-  .shell-resize-handle--right { display: block; }
+  .shell-grid { --sidebar-size: 260px; grid-template-columns: var(--sidebar-size, 260px) minmax(0, 1fr) var(--right-panel-size, 320px); }
+  .shell-resize-handle--left, .shell-resize-handle--right { display: block; }
 }
 @media (max-width: 1279px) { .shell-right-panel { min-width: 0; } }
 @media (prefers-reduced-motion: reduce) {
