@@ -8,7 +8,7 @@ type ShellProps = { sidebar: ReactNode; header: ReactNode; rightPanel: ReactNode
 type ResizeTarget = "left" | "right";
 type ResizeSession = { target: ResizeTarget; startX: number; startWidth: number };
 
-const MIN_SIDEBAR = 224;
+const MIN_SIDEBAR = 88;
 const MAX_SIDEBAR = 400;
 const MIN_RIGHT_PANEL = 280;
 const MAX_RIGHT_PANEL = 460;
