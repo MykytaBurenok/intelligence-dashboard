@@ -8,6 +8,7 @@ A market and news monitoring dashboard built with Next.js, React, TypeScript, an
 - News articles from NewsAPI.
 - A compact AI-generated summary from Groq when configured.
 - A horizontally scrollable news feed with selected-story details, story pagination, and provider-backed page loading.
+- Article-specific AI analysis on the home dashboard, with publisher-description fallback when the AI provider is unavailable.
 - Search and keyword-based Macro, Markets, and Technology news filters.
 - Browser-persisted watchlist.
 - Market overview, signals, narrative summaries, scenario status, and settings pages.
@@ -17,6 +18,9 @@ A market and news monitoring dashboard built with Next.js, React, TypeScript, an
 ## Data integrity notes
 
 - Market values and articles are shown only when valid responses are returned by their providers.
+- Market Snapshot cards are global quotes and are not expected to change when a news story is selected.
+- The selected-story analysis updates when the selected article changes and uses its title and description as context.
+- The AI analysis does not fetch or verify the full linked article page. Its conclusions are limited to metadata and description supplied by the news provider.
 - The dashboard does not currently have a calibrated forecasting model. Scenario probabilities are therefore intentionally not displayed.
 - AI-reported confidence is a subjective language-model estimate, not a calibrated probability or investment recommendation.
 - News category filters use keyword matching and should not be interpreted as financial signals.
@@ -73,17 +77,18 @@ Core dashboard rules, including news pagination boundaries, have automated unit 
 
 ## Architecture
 
-- `src/app`: Next.js App Router pages.
+- `src/app`: Next.js App Router pages and API routes.
 - `src/components`: dashboard shell, cards, navigation, and client-side interactions.
 - `src/lib/api`: external provider clients and request handling.
 - `src/lib/dashboard.ts`: server-side data aggregation and fallback behavior.
 - `src/types`: shared data contracts.
 
-The application uses server-rendered data fetching for provider requests and client components for search, filtering, theming, and watchlist interactions.
+The application uses server-rendered data fetching for provider requests and client components for search, filtering, theming, and watchlist interactions. The `POST /api/article-brief` endpoint validates article fields, calls the server-side AI provider, and returns an article-specific brief without exposing API credentials to the browser.
 
 ## Known limitations
 
-- Scenario probabilities and calibrated market forecasts are not implemented.
+- Historical price charts and calibrated market forecasts are not implemented yet.
+- Article analysis is based on the title and description returned by NewsAPI, not the full article text.
 - Topic filters use lightweight keyword matching rather than a trained classifier.
 - The watchlist is stored in the current browser and is not synchronized across devices.
 - Theme and feed preferences are stored in the current browser; they are not synchronized across devices.
