@@ -69,9 +69,8 @@ export default function NewsFeed({
     });
   }, [articles, query, activeFilter]);
 
-  const safeIndex = filteredArticles.length
-    ? Math.min(selectedIndex, filteredArticles.length - 1)
-    : 0;
+  const foundIndex = filteredArticles.findIndex((article) => article.url === selectedUrl);
+  const safeIndex = foundIndex >= 0 ? foundIndex : 0;
   const selectedArticle = filteredArticles[safeIndex];
 
   useEffect(() => {
