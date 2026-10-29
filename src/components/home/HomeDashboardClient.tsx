@@ -87,16 +87,17 @@ export default function HomeDashboardClient({
 
   const onArticleChange = useCallback((article: DashboardArticle | undefined) => {
     setSelectedArticle(article);
+    if (article) {
+      setArticleBrief(articleFallback(article));
+      setIsAnalyzingArticle(true);
+      setAnalysisError("");
+    }
   }, []);
 
   useEffect(() => {
     if (!selectedArticle) return;
 
     const controller = new AbortController();
-    setArticleBrief(articleFallback(selectedArticle));
-    setIsAnalyzingArticle(true);
-    setAnalysisError("");
-
     fetch("/api/article-brief", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
