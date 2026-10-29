@@ -52,6 +52,8 @@ export default function NewsFeed({
 }: NewsFeedProps) {
   const [articles, setArticles] = useState(initialArticles);
   const [selectedUrl, setSelectedUrl] = useState(initialArticles[0]?.url ?? "");
+  const [internalFilter, setInternalFilter] = useState<NewsFilter>("All news");
+  const effectiveFilter = onFilterChange ? activeFilter : internalFilter;
   const [nextApiPage, setNextApiPage] = useState(initialArticles.length === 0 ? 1 : 2);
   const [hasMore, setHasMore] = useState(initialArticles.length === 0 || initialArticles.length >= PAGE_SIZE);
   const [isLoading, setIsLoading] = useState(false);
@@ -65,9 +67,9 @@ export default function NewsFeed({
       const searchable = [article.title, article.description, article.source]
         .filter(Boolean).join(" ").toLowerCase();
       return (!normalizedQuery || searchable.includes(normalizedQuery)) &&
-        matchesNewsTopic(article, activeFilter);
+        matchesNewsTopic(article, effectiveFilter);
     });
-  }, [articles, query, activeFilter]);
+  }, [articles, query, effectiveFilter]);
 
   const foundIndex = filteredArticles.findIndex((article) => article.url === selectedUrl);
   const safeIndex = foundIndex >= 0 ? foundIndex : 0;
@@ -126,7 +128,7 @@ export default function NewsFeed({
         const searchable = [article.title, article.description, article.source]
           .filter(Boolean).join(" ").toLowerCase();
         return (!normalizedQuery || searchable.includes(normalizedQuery)) &&
-          matchesNewsTopic(article, activeFilter);
+          matchesNewsTopic(article, effectiveFilter);
       });
       if (nextArticle) setSelectedUrl(nextArticle.url);
     }
@@ -147,16 +149,16 @@ export default function NewsFeed({
             {filteredArticles.length} loaded · Select a story to inspect it
           </p>
         </div>
-        {showFilters && onFilterChange ? (
+        {showFilters ? (
           <div className="flex flex-wrap gap-2" aria-label="Filter news by topic">
             {FILTERS.map((filter) => (
               <button
                 key={filter}
                 type="button"
-                aria-pressed={activeFilter === filter}
-                onClick={() => onFilterChange(filter)}
+                aria-pressed={effectiveFilter === filter}
+                onClick={() => onFilterChange ? onFilterChange(filter) : setInternalFilter(filter)}
                 className={`rounded-xl border px-3 py-2 text-xs font-semibold transition ${
-                  activeFilter === filter
+                  effectiveFilter === filter
                     ? "border-[var(--border-strong)] bg-[var(--surface-strong)] text-[var(--text)]"
                     : "border-[var(--border)] bg-[var(--surface-soft)] text-[var(--text-muted)] hover:text-[var(--text)]"
                 }`}
