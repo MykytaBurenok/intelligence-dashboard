@@ -89,9 +89,6 @@ export default function HomeDashboardClient({
 
   const onArticleChange = useCallback((article: DashboardArticle | undefined) => {
     setSelectedArticle(article);
-    setAnalysisError("");
-    setIsAnalyzingArticle(Boolean(article));
-    if (article) setArticleBrief(articleFallback(article));
   }, []);
 
   useEffect(() => {
