@@ -91,7 +91,7 @@ export default function EventCard({ shift }: Props) {
 
           <div className="mt-6 rounded-2xl border border-[var(--border)] bg-[var(--surface-soft)] p-4">
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--text-faint)]">
-              Market data available
+              Tracked market symbols
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
               {shift.affectedMarkets.length ? shift.affectedMarkets.map((item) => (
