@@ -50,6 +50,7 @@ export default function Sidebar() {
               key={label}
               href={href}
               aria-current={isActive ? "page" : undefined}
+              aria-label={`${label}: ${description}`}
               className={\`flex w-full items-center gap-3 rounded-xl border px-3 py-2.5 text-left transition \${
                 isActive
                   ? "border-[var(--border-strong)] bg-[var(--surface-strong)] text-[var(--text)] shadow-[var(--shadow-accent)]"
@@ -63,7 +64,6 @@ export default function Sidebar() {
                 <span className="block text-sm font-medium">{label}</span>
                 <span className="mt-0.5 block text-[11px] leading-4 text-[var(--text-faint)]">{description}</span>
               </span>
-              <span className="sr-only">{label}: {description}</span>
             </Link>
           );
         })}
