@@ -415,3 +415,105 @@ video {
 .mobile-navigation-panel .sidebar-watchlist {
   display: block;
 }
+
+
+/* Motion polish: short, purposeful transitions that stay out of the way. */
+@keyframes dashboard-rise-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 12px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes dashboard-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes dashboard-chart-draw {
+  from { stroke-dashoffset: 1800; }
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes dashboard-chart-wash {
+  from { opacity: 0; }
+  to { opacity: 0.09; }
+}
+
+.shell-main > * {
+  animation: dashboard-rise-in 560ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+.shell-header {
+  animation: dashboard-fade-in 420ms ease-out both;
+}
+
+.shell-sidebar {
+  animation: dashboard-fade-in 520ms ease-out both;
+}
+
+.shell-right-panel {
+  animation: dashboard-rise-in 600ms cubic-bezier(0.2, 0.7, 0.2, 1) 70ms both;
+}
+
+.card,
+.panel {
+  transition:
+    transform 220ms cubic-bezier(0.2, 0.7, 0.2, 1),
+    box-shadow 220ms ease,
+    border-color 220ms ease,
+    background-color 220ms ease;
+}
+
+.card:hover {
+  border-color: var(--border-strong);
+  transform: translateY(-2px);
+}
+
+button,
+input,
+select {
+  transition:
+    border-color 180ms ease,
+    background-color 180ms ease,
+    box-shadow 180ms ease,
+    color 180ms ease,
+    transform 180ms ease;
+}
+
+button:active:not(:disabled) {
+  transform: scale(0.985);
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+.metric-line {
+  transition: width 720ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dashboard-chart-line {
+  stroke-dasharray: 1800;
+  stroke-dashoffset: 1800;
+  animation: dashboard-chart-draw 1100ms cubic-bezier(0.2, 0.7, 0.2, 1) 80ms forwards;
+}
+
+.dashboard-chart-area {
+  animation: dashboard-chart-wash 850ms ease-out 160ms both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
