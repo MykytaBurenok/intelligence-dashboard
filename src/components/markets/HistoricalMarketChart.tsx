@@ -39,6 +39,9 @@ export default function HistoricalMarketChart() {
       .then(async (response) => {
         const payload = (await response.json()) as HistoryResponse;
         if (!response.ok) throw new Error(payload.error || "Historical data could not be loaded.");
+        if (!Array.isArray(payload.points) || payload.points.length < 2) {
+          throw new Error("The market data providers returned no usable historical prices.");
+        }
         return payload;
       })
       .then((payload) => setData(payload))
@@ -81,7 +84,7 @@ export default function HistoricalMarketChart() {
         <div>
           <p className="dashboard-kicker">Historical performance</p>
           <h2 id="historical-chart-title" className="mt-1 text-xl font-semibold text-[var(--text)]">Price history</h2>
-          <p className="mt-1 text-sm text-[var(--text-muted)]">Daily closing prices · source: Finnhub</p>
+          <p className="mt-1 text-sm text-[var(--text-muted)]">Daily closing prices · source: {data?.source ?? "market data providers"}</p>
         </div>
         <label className="flex items-center gap-2 text-sm text-[var(--text-muted)]">
           <span>Asset</span>
@@ -110,7 +113,7 @@ export default function HistoricalMarketChart() {
           <div className="flex min-h-[260px] flex-col items-center justify-center rounded-xl border border-dashed border-[var(--border)] px-6 text-center">
             <p className="text-sm font-semibold text-[var(--text)]">Historical data unavailable</p>
             <p className="mt-2 max-w-md text-sm leading-6 text-[var(--text-muted)]">{error}</p>
-            <p className="mt-2 text-xs text-[var(--text-faint)]">Check that FINNHUB_KEY is configured and the provider supports this symbol.</p>
+            <p className="mt-2 text-xs text-[var(--text-faint)]">The chart tries Finnhub first, then Yahoo Finance. Both providers may temporarily limit requests.</p>
           </div>
         ) : chart ? (
           <>
