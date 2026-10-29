@@ -1,5 +1,6 @@
 import DashboardPageShell from "@/components/layout/DashboardPageShell";
 import { getDashboardData } from "@/lib/dashboard";
+import HistoricalMarketChart from "@/components/markets/HistoricalMarketChart";
 
 export const dynamic = "force-dynamic";
 
@@ -28,6 +29,8 @@ export default async function MarketsPage() {
           feed.
         </p>
       </section>
+
+      <HistoricalMarketChart />
 
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {data.quotes.map((quote) => (

@@ -5,6 +5,7 @@ A market and news monitoring dashboard built with Next.js, React, TypeScript, an
 ## Current capabilities
 
 - Market quotes from Finnhub for a configurable list of symbols.
+- Historical daily closing-price charts for SPY, QQQ, GLD, and USO over 1M, 3M, and 1Y ranges, sourced from Finnhub candles.
 - News articles from NewsAPI.
 - A compact AI-generated summary from Groq when configured.
 - A horizontally scrollable news feed with selected-story details, story pagination, and provider-backed page loading.
@@ -14,10 +15,12 @@ A market and news monitoring dashboard built with Next.js, React, TypeScript, an
 - Market overview, signals, narrative summaries, scenario status, and settings pages.
 - Browser-persisted theme, default topic, and feed-density preferences.
 - Responsive desktop sidebar and mobile navigation drawer.
+- Lightweight CSS motion for page entry, chart drawing, and control feedback, with `prefers-reduced-motion` support.
 
 ## Data integrity notes
 
 - Market values and articles are shown only when valid responses are returned by their providers.
+- Historical charts use Finnhub daily candle close values, not generated or interpolated sample data. Unsupported symbols, provider errors, and insufficient observations produce an unavailable state.
 - Market Snapshot cards are global quotes and are not expected to change when a news story is selected.
 - The selected-story analysis updates when the selected article changes and uses its title and description as context.
 - The AI analysis does not fetch or verify the full linked article page. Its conclusions are limited to metadata and description supplied by the news provider.
@@ -78,6 +81,8 @@ Core dashboard rules, including news pagination boundaries, have automated unit 
 ## Architecture
 
 - `src/app`: Next.js App Router pages and API routes.
+- `src/app/api/market/history/route.ts`: validated, cached historical candle endpoint for the chart.
+- `src/components/markets/HistoricalMarketChart.tsx`: interactive client-side SVG chart and period statistics.
 - `src/components`: dashboard shell, cards, navigation, and client-side interactions.
 - `src/lib/api`: external provider clients and request handling.
 - `src/lib/dashboard.ts`: server-side data aggregation and fallback behavior.
@@ -87,7 +92,7 @@ The application uses server-rendered data fetching for provider requests and cli
 
 ## Known limitations
 
-- Historical price charts and calibrated market forecasts are not implemented yet.
+- Historical charts currently support daily candles for 1M, 3M, and 1Y. Intraday intervals, benchmark comparison, volume, and calibrated market forecasts are not implemented yet.
 - Article analysis is based on the title and description returned by NewsAPI, not the full article text.
 - Topic filters use lightweight keyword matching rather than a trained classifier.
 - The watchlist is stored in the current browser and is not synchronized across devices.
