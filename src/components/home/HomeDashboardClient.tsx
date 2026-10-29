@@ -8,7 +8,7 @@ import ImpactCard from "@/components/cards/ImpactCard";
 import ScenarioCard from "@/components/cards/ScenarioCard";
 import NewsFeed from "@/components/home/NewsFeed";
 import { matchesNewsTopic } from "@/lib/dashboard-logic.mjs";
-import type { AIBrief, DashboardArticle } from "@/types/dashboard";
+import type { AIBrief, DashboardArticle, DashboardBrief } from "@/types/dashboard";
 
 type MetricItem = {
   label: string;
@@ -36,6 +36,21 @@ type HomeDashboardClientProps = {
 
 const FILTERS: NewsFilter[] = ["All news", "Macro", "Markets", "Technology"];
 
+type ArticleBriefResponse = DashboardBrief & { error?: string };
+
+function toAIBrief(brief: DashboardBrief): AIBrief {
+  return { whatThisMeans: brief.summary, keyTakeaways: brief.takeaways, featuredTitle: brief.headline, scenarios: [] };
+}
+
+function articleFallback(article: DashboardArticle): AIBrief {
+  return {
+    whatThisMeans: article.description || "The publisher did not provide a description for this story.",
+    keyTakeaways: article.description ? [article.description] : [],
+    featuredTitle: article.title,
+    scenarios: [],
+  };
+}
+
 export default function HomeDashboardClient({
   articles,
   generatedAt,
@@ -46,6 +61,11 @@ export default function HomeDashboardClient({
   const [query, setQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState<NewsFilter>("All news");
   const [selectedArticle, setSelectedArticle] = useState<DashboardArticle>();
+  const [articleAnalysis, setArticleAnalysis] = useState<{
+    articleUrl: string;
+    brief: AIBrief;
+    error?: string;
+  }>();
   const [density, setDensity] = useState<FeedDensity>("comfortable");
 
   useEffect(() => {
@@ -71,6 +91,47 @@ export default function HomeDashboardClient({
     setSelectedArticle(article);
   }, []);
 
+  useEffect(() => {
+    if (!selectedArticle) return;
+
+    const controller = new AbortController();
+
+    fetch("/api/article-brief", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ article: selectedArticle }),
+      signal: controller.signal,
+    })
+      .then(async (response) => {
+        const payload = (await response.json()) as ArticleBriefResponse;
+        if (!response.ok) throw new Error(payload.error || "Article analysis is temporarily unavailable.");
+        return payload;
+      })
+      .then((payload) => {
+        if (!controller.signal.aborted) {
+          setArticleAnalysis({ articleUrl: selectedArticle.url, brief: toAIBrief(payload) });
+        }
+      })
+      .catch((error: unknown) => {
+        if (error instanceof Error && error.name === "AbortError") return;
+        if (!controller.signal.aborted) {
+          setArticleAnalysis({
+            articleUrl: selectedArticle.url,
+            brief: articleFallback(selectedArticle),
+            error: "AI analysis is unavailable. Showing the publisher-provided description instead.",
+          });
+        }
+      });
+
+    return () => controller.abort();
+  }, [selectedArticle]);
+
+  const currentArticleAnalysis = selectedArticle && articleAnalysis?.articleUrl === selectedArticle.url
+    ? articleAnalysis
+    : undefined;
+  const articleBrief = selectedArticle
+    ? currentArticleAnalysis?.brief ?? articleFallback(selectedArticle)
+    : aiBrief;
   const shareTitle = selectedArticle?.title ?? brief.headline;
   const shareUrl = selectedArticle?.url;
 
@@ -95,7 +156,13 @@ export default function HomeDashboardClient({
           shareUrl={shareUrl}
         />
       }
-      rightPanel={<ScenarioCard aiBrief={aiBrief} />}
+      rightPanel={
+        <ScenarioCard
+          aiBrief={articleBrief}
+          isLoading={Boolean(selectedArticle && !currentArticleAnalysis)}
+          analysisError={currentArticleAnalysis?.error}
+        />
+      }
     >
       <div className="mx-auto max-w-[1120px] space-y-7">
         <section className="flex flex-col gap-4 border-b border-[var(--border)] pb-6 sm:flex-row sm:items-end sm:justify-between">
