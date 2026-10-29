@@ -220,10 +220,10 @@ export default function NewsFeed({
             key={article.url}
             ref={(node) => { cardRefs.current[index] = node; }}
             type="button"
-            aria-pressed={activeArticle?.url === article.url}
+            aria-pressed={selectedArticle?.url === article.url}
             onClick={() => setSelectedUrl(article.url)}
             className={`group shrink-0 snap-start rounded-2xl border text-left transition ${density === "compact" ? "w-[220px] p-3 sm:w-[250px]" : "w-[260px] p-4 sm:w-[300px]"} ${
-              activeArticle?.url === article.url
+              selectedArticle?.url === article.url
                 ? "border-[var(--accent)] bg-[var(--accent-soft)] shadow-[var(--shadow-accent)]"
                 : "border-[var(--border)] bg-[var(--surface-soft)] hover:border-[var(--border-strong)]"
             }`}
@@ -287,7 +287,7 @@ export default function NewsFeed({
           </span>
           <button
             type="button"
-            onClick={loadMore}
+            onClick={() => void loadMore()}
             disabled={!hasMore || isLoading}
             className="premium-button inline-flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold disabled:cursor-not-allowed disabled:opacity-45"
           >
