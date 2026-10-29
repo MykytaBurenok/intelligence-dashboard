@@ -87,11 +87,11 @@ export default function HomeDashboardClient({
     ? {
         title: activeArticle.title,
         summary: activeArticle.description || brief.summary,
-        confidence: brief.confidence,
+        confidence: 0,
         direction: "Not assessed",
         affectedNarratives: [],
         affectedMarkets: quotes.map((q) => q.symbol).slice(0, 4),
-        impactScore: brief.confidence,
+        impactScore: 0,
         updatedAt: activeArticle.publishedAt || generatedAt,
       }
     : {
