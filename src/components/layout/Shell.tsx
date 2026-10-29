@@ -37,8 +37,8 @@ export default function Shell({ sidebar, header, rightPanel, children }: ShellPr
     const handleMove = (event: PointerEvent) => {
       if (frame) window.cancelAnimationFrame(frame);
       frame = window.requestAnimationFrame(() => {
-        root.style.setProperty("--pointer-x", `${event.clientX - window.innerWidth / 2}px`);
-        root.style.setProperty("--pointer-y", `${event.clientY - window.innerHeight / 2}px`);
+        document.documentElement.style.setProperty("--pointer-x", `${(event.clientX - window.innerWidth / 2) * 0.035}px`);
+        document.documentElement.style.setProperty("--pointer-y", `${(event.clientY - window.innerHeight / 2) * 0.035}px`);
       });
     };
     window.addEventListener("pointermove", handleMove, { passive: true });
