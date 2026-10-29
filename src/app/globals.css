@@ -884,34 +884,6 @@ body::after {
 .shell-resize-handle--left { right: -6px; }
 .shell-resize-handle--right { left: -6px; }
 .shell-frame.is-resizing, .shell-frame.is-resizing * { cursor: col-resize !important; user-select: none !important; }
-.shell-main > * { animation: workspace-enter 720ms cubic-bezier(.16,1,.3,1) both; }
-.shell-main > * > section,
-.shell-main > * > div > section { animation: workspace-enter 720ms cubic-bezier(.16,1,.3,1) both; }
-.shell-main > * > section:nth-child(2),
-.shell-main > * > div > section:nth-child(2) { animation-delay: 90ms; }
-.shell-main > * > section:nth-child(3),
-.shell-main > * > div > section:nth-child(3) { animation-delay: 170ms; }
-.shell-main > * > section:nth-child(4),
-.shell-main > * > div > section:nth-child(4) { animation-delay: 240ms; }
-.shell-header { animation: header-enter 520ms cubic-bezier(.16,1,.3,1) both; }
-.shell-sidebar { animation: sidebar-enter 680ms cubic-bezier(.16,1,.3,1) both; }
-.shell-right-panel { animation: panel-enter 760ms cubic-bezier(.16,1,.3,1) 80ms both; }
-@keyframes workspace-enter {
-  from { opacity: 0; transform: translate3d(0, 18px, 0) scale(.992); filter: blur(5px); }
-  to { opacity: 1; transform: translate3d(0, 0, 0) scale(1); filter: blur(0); }
-}
-@keyframes header-enter {
-  from { opacity: 0; transform: translate3d(0,-8px,0); }
-  to { opacity: 1; transform: translate3d(0,0,0); }
-}
-@keyframes sidebar-enter {
-  from { opacity: 0; transform: translate3d(-12px,0,0); }
-  to { opacity: 1; transform: translate3d(0,0,0); }
-}
-@keyframes panel-enter {
-  from { opacity: 0; transform: translate3d(14px,8px,0); }
-  to { opacity: 1; transform: translate3d(0,0,0); }
-}
 .card, .panel {
   position: relative;
   overflow: visible;
