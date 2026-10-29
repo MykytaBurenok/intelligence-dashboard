@@ -1,4 +1,5 @@
 import { requestJson, requireEnv } from "@/lib/api/client";
+import { normalizeConfidence } from "@/lib/dashboard-logic.mjs";
 import type {
   DashboardArticle,
   DashboardBrief,
@@ -53,14 +54,6 @@ function parseBrief(
         ).slice(0, 5)
       : [];
 
-    const confidence =
-      typeof candidate.confidence === "number" &&
-      Number.isFinite(candidate.confidence) &&
-      candidate.confidence >= 0 &&
-      candidate.confidence <= 100
-        ? candidate.confidence
-        : 0;
-
     return {
       headline:
         typeof candidate.headline === "string" && candidate.headline.trim()
@@ -71,7 +64,7 @@ function parseBrief(
           ? candidate.summary.trim()
           : fallback.summary,
       takeaways: takeaways.length ? takeaways : fallback.takeaways,
-      confidence,
+      confidence: normalizeConfidence(candidate.confidence),
     };
   } catch {
     return fallback;
