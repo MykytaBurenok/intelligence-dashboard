@@ -829,8 +829,8 @@ body::after {
 }
 body::before {
   background:
-    radial-gradient(ellipse at calc(18% + var(--pointer-x, 0px) * .06) calc(22% + var(--pointer-y, 0px) * .04), color-mix(in srgb, var(--accent) 22%, transparent), transparent 34%),
-    radial-gradient(ellipse at calc(82% - var(--pointer-x, 0px) * .04) calc(18% - var(--pointer-y, 0px) * .03), color-mix(in srgb, var(--accent-2) 20%, transparent), transparent 32%),
+    radial-gradient(ellipse at calc(18% + var(--pointer-x, 0px)) calc(22% + var(--pointer-y, 0px)), color-mix(in srgb, var(--accent) 22%, transparent), transparent 34%),
+    radial-gradient(ellipse at calc(82% - var(--pointer-x, 0px)) calc(18% - var(--pointer-y, 0px)), color-mix(in srgb, var(--accent-2) 20%, transparent), transparent 32%),
     radial-gradient(ellipse at 55% 88%, color-mix(in srgb, var(--accent-3) 12%, transparent), transparent 38%);
   filter: blur(36px);
   opacity: .92;
@@ -858,8 +858,14 @@ body::after {
   grid-template-columns: minmax(0, 1fr);
 }
 .shell-sidebar, .shell-right-panel { min-width: 0; }
-.shell-sidebar { overflow-x: visible; overflow-y: auto; }
-.shell-right-panel { overflow-x: visible; overflow-y: auto; }
+.shell-sidebar { overflow-x: visible; overflow-y: auto; container-type: inline-size; }
+.shell-sidebar .sidebar-label { display: none; }
+.shell-sidebar .sidebar-watchlist { display: none; }
+@container (min-width: 190px) {
+  .shell-sidebar .sidebar-label { display: block; }
+  .shell-sidebar .sidebar-watchlist { display: block; }
+}
+.shell-right-panel { overflow: visible; }
 .shell-resize-handle {
   position: absolute; z-index: 30; top: 0; bottom: 0; display: none;
   width: 12px; padding: 0; border: 0; background: transparent;
@@ -879,9 +885,14 @@ body::after {
 .shell-resize-handle--right { left: -6px; }
 .shell-frame.is-resizing, .shell-frame.is-resizing * { cursor: col-resize !important; user-select: none !important; }
 .shell-main > * { animation: workspace-enter 720ms cubic-bezier(.16,1,.3,1) both; }
-.shell-main > *:nth-child(2) { animation-delay: 90ms; }
-.shell-main > *:nth-child(3) { animation-delay: 170ms; }
-.shell-main > *:nth-child(4) { animation-delay: 240ms; }
+.shell-main > * > section,
+.shell-main > * > div > section { animation: workspace-enter 720ms cubic-bezier(.16,1,.3,1) both; }
+.shell-main > * > section:nth-child(2),
+.shell-main > * > div > section:nth-child(2) { animation-delay: 90ms; }
+.shell-main > * > section:nth-child(3),
+.shell-main > * > div > section:nth-child(3) { animation-delay: 170ms; }
+.shell-main > * > section:nth-child(4),
+.shell-main > * > div > section:nth-child(4) { animation-delay: 240ms; }
 .shell-header { animation: header-enter 520ms cubic-bezier(.16,1,.3,1) both; }
 .shell-sidebar { animation: sidebar-enter 680ms cubic-bezier(.16,1,.3,1) both; }
 .shell-right-panel { animation: panel-enter 760ms cubic-bezier(.16,1,.3,1) 80ms both; }
@@ -951,8 +962,8 @@ button:active:not(:disabled) { transform: scale(.985); }
   .shell-resize-handle--right { display: block; }
   .shell-right-panel {
     position: sticky; top: 0; align-self: start;
-    height: auto; max-height: 100vh; min-height: 0;
-    overflow-y: auto; overflow-x: visible;
+    height: fit-content; max-height: none; min-height: 0;
+    overflow: visible;
   }
 }
 @media (max-width: 1279px) {
