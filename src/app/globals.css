@@ -785,7 +785,7 @@ body::after {
 .shell-resize-handle:hover::before, .shell-resize-handle:focus-visible::before, .shell-resize-handle[aria-valuenow]::before {
   background: var(--accent); box-shadow: 0 0 14px color-mix(in srgb, var(--accent) 65%, transparent);
 }
-.shell-resize-handle--left { right: -5px; }
+.shell-resize-handle--left { right: 0; }
 .shell-resize-handle--right { left: -5px; }
 .shell-resize-handle:active::before { width: 2px; left: 3px; }
 .shell-frame.is-resizing, .shell-frame.is-resizing * { cursor: col-resize !important; user-select: none !important; }
