@@ -1,5 +1,7 @@
 import "./globals.css";
-import { WatchlistProvider } from "@/components/providers/WatchlistProvider";\nimport ScrollReset from "@/components/layout/ScrollReset";
+import { WatchlistProvider } from "@/components/providers/WatchlistProvider";
+import ScrollReset from "@/components/layout/ScrollReset";
+import ScrollReset from "@/components/layout/ScrollReset";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -15,6 +17,7 @@ export default function RootLayout({
   return (
     <html lang="en" data-theme="default" suppressHydrationWarning>
       <body>
+        <ScrollReset />
         <WatchlistProvider>{children}</WatchlistProvider>
       </body>
     </html>
