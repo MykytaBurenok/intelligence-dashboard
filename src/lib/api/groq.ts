@@ -30,7 +30,7 @@ function fallbackBrief(articles: DashboardArticle[]): DashboardBrief {
       articles[0]?.description ??
       "Latest market and news inputs are available for review.",
     takeaways: articles.slice(0, 3).map((article) => article.title),
-    confidence: 60,
+    confidence: 0,
   };
 }
 
@@ -38,21 +38,43 @@ function parseBrief(
   content: string,
   articles: DashboardArticle[],
 ): DashboardBrief {
+  const fallback = fallbackBrief(articles);
+
   try {
-    const parsed = JSON.parse(content) as Partial<DashboardBrief>;
+    const parsed: unknown = JSON.parse(content);
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+      return fallback;
+    }
+
+    const candidate = parsed as Partial<DashboardBrief>;
+    const takeaways = Array.isArray(candidate.takeaways)
+      ? candidate.takeaways.filter((item): item is string =>
+          typeof item === "string" && item.trim().length > 0
+        ).slice(0, 5)
+      : [];
+
+    const confidence =
+      typeof candidate.confidence === "number" &&
+      Number.isFinite(candidate.confidence) &&
+      candidate.confidence >= 0 &&
+      candidate.confidence <= 100
+        ? candidate.confidence
+        : 0;
 
     return {
-      headline: parsed.headline || fallbackBrief(articles).headline,
-      summary: parsed.summary || fallbackBrief(articles).summary,
-      takeaways:
-        Array.isArray(parsed.takeaways) && parsed.takeaways.length > 0
-          ? parsed.takeaways.slice(0, 5).map(String)
-          : fallbackBrief(articles).takeaways,
-      confidence:
-        typeof parsed.confidence === "number" ? parsed.confidence : 60,
+      headline:
+        typeof candidate.headline === "string" && candidate.headline.trim()
+          ? candidate.headline.trim()
+          : fallback.headline,
+      summary:
+        typeof candidate.summary === "string" && candidate.summary.trim()
+          ? candidate.summary.trim()
+          : fallback.summary,
+      takeaways: takeaways.length ? takeaways : fallback.takeaways,
+      confidence,
     };
   } catch {
-    return fallbackBrief(articles);
+    return fallback;
   }
 }
 
@@ -68,7 +90,7 @@ export async function generateDashboardBrief({
     {
       role: "system",
       content:
-        "Return only compact JSON with headline, summary, takeaways, and confidence. No markdown.",
+        "Return only compact JSON with headline, summary, takeaways, and confidence. No markdown. Confidence must be an integer from 0 to 100 representing your subjective confidence in this summary, not a calibrated probability or investment recommendation.",
     },
     {
       role: "user",
