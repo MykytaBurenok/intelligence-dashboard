@@ -15,7 +15,18 @@ export default function ImpactCard({
   description,
   intensity,
 }: ImpactCardProps) {
-  const positive = change.startsWith("+");
+  const numericChange = Number.parseFloat(change.replace("%", ""));
+  const hasNumericChange = Number.isFinite(numericChange) && /%$/.test(change);
+  const changeClass = hasNumericChange
+    ? numericChange > 0
+      ? "text-[var(--success)]"
+      : numericChange < 0
+        ? "text-[var(--danger)]"
+        : "text-[var(--text-muted)]"
+    : "text-[var(--text-muted)]";
+  const safeIntensity = Number.isFinite(intensity)
+    ? Math.min(100, Math.max(0, intensity))
+    : 0;
 
   return (
     <div className="card p-4">
@@ -33,18 +44,12 @@ export default function ImpactCard({
 
       <p className="mt-3 text-2xl font-semibold text-[var(--text)]">{value}</p>
 
-      <p
-        className={`mt-1 text-sm font-semibold ${
-          positive ? "text-[var(--success)]" : "text-[var(--danger)]"
-        }`}
-      >
-        {change}
-      </p>
+      <p className={`mt-1 text-sm font-semibold ${changeClass}`}>{change}</p>
 
       <div className="mt-4 h-1 rounded-full bg-[var(--surface-strong)]">
         <div
           className="metric-line h-full rounded-full"
-          style={{ width: `${intensity}%` }}
+          style={{ width: `${safeIntensity}%` }}
         />
       </div>
 
