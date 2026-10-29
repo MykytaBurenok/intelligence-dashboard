@@ -15,7 +15,7 @@ function fallbackBrief(articles: DashboardArticle[]): DashboardBrief {
       articles[0]?.description ??
       "Latest market and news inputs are available for review.",
     takeaways: articles.slice(0, 3).map((article) => article.title),
-    confidence: 60,
+    confidence: 0,
   };
 }
 
