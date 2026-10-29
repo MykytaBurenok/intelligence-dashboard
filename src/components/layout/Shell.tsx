@@ -107,7 +107,8 @@ export default function Shell({ sidebar, header, rightPanel, children }: ShellPr
               if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
                 event.preventDefault();
                 const delta = event.key === "ArrowRight" ? 12 : -12;
-                const width = Math.min(MAX_SIDEBAR, Math.max(MIN_SIDEBAR, (sidebarWidth ?? 260) + delta));
+                const defaultWidth = window.matchMedia("(min-width: 1280px)").matches ? 260 : 88;
+                const width = Math.min(MAX_SIDEBAR, Math.max(MIN_SIDEBAR, (sidebarWidth ?? defaultWidth) + delta));
                 setSidebarWidth(width); window.localStorage.setItem("reality-shift-sidebar-width", String(width));
               }
               if (event.key === "Home") resetWidth("left");
