@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { CSSProperties, PointerEvent as ReactPointerEvent, ReactNode } from "react";
 import MobileNavigation from "@/components/layout/MobileNavigation";
+import { gsap } from "gsap";
 
 type ShellProps = { sidebar: ReactNode; header: ReactNode; rightPanel: ReactNode; children: ReactNode };
 type ResizeTarget = "left" | "right";
@@ -46,6 +47,23 @@ export default function Shell({ sidebar, header, rightPanel, children }: ShellPr
       window.removeEventListener("pointermove", handleMove);
       if (frame) window.cancelAnimationFrame(frame);
     };
+  }, []);
+
+  useEffect(() => {
+    const root = shellRef.current;
+    if (!root || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    const context = gsap.context(() => {
+      const timeline = gsap.timeline({ defaults: { ease: "power3.out" } });
+      timeline
+        .fromTo(".shell-header", { autoAlpha: 0, y: -12 }, { autoAlpha: 1, y: 0, duration: 0.55 }, 0)
+        .fromTo(".shell-sidebar", { autoAlpha: 0, x: -14 }, { autoAlpha: 1, x: 0, duration: 0.62 }, 0.04)
+        .fromTo(".shell-right-panel", { autoAlpha: 0, x: 16 }, { autoAlpha: 1, x: 0, duration: 0.68 }, 0.08)
+        .fromTo(".shell-main .dashboard-kicker", { autoAlpha: 0, y: 8 }, { autoAlpha: 1, y: 0, duration: 0.42, stagger: 0.055 }, 0.12)
+        .fromTo(".shell-main .card, .shell-main .panel", { autoAlpha: 0, y: 16, scale: 0.985 }, { autoAlpha: 1, y: 0, scale: 1, duration: 0.58, stagger: 0.045 }, 0.18);
+    }, root);
+
+    return () => context.revert();
   }, []);
 
   const finishResize = useCallback(() => {
