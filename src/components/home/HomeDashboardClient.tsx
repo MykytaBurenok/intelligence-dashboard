@@ -144,7 +144,7 @@ export default function HomeDashboardClient({
           shareUrl={shareUrl}
         />
       }
-      rightPanel={<ScenarioCard aiBrief={aiBrief} />}
+      rightPanel={<ScenarioCard aiBrief={articleBrief} isLoading={isAnalyzingArticle} analysisError={analysisError} />}
     >
       <div className="mx-auto max-w-[1120px] space-y-7">
         <section className="flex flex-col gap-4 border-b border-[var(--border)] pb-6 sm:flex-row sm:items-end sm:justify-between">
