@@ -24,7 +24,7 @@ function TypedText({ text, className = "" }: { text: string; className?: string 
   }, [text]);
 
   return (
-    <span className={className} aria-label={text}>
+    <span className={className} aria-label={text} aria-live="off">
       <span aria-hidden="true">{text.slice(0, visibleLength)}</span>
       {visibleLength < text.length && (
         <span className="typewriter-caret" aria-hidden="true">▍</span>
