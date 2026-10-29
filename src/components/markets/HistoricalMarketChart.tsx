@@ -34,9 +34,6 @@ export default function HistoricalMarketChart() {
 
   useEffect(() => {
     const controller = new AbortController();
-    setLoading(true);
-    setError("");
-    setActiveIndex(null);
 
     fetch(`/api/market/history?symbol=${symbol}&range=${range}`, { signal: controller.signal })
       .then(async (response) => {
@@ -88,7 +85,7 @@ export default function HistoricalMarketChart() {
         </div>
         <label className="flex items-center gap-2 text-sm text-[var(--text-muted)]">
           <span>Asset</span>
-          <select value={symbol} onChange={(event) => setSymbol(event.target.value as (typeof SYMBOLS)[number])} className="rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 py-2 font-semibold text-[var(--text)] outline-none focus:ring-2 focus:ring-[var(--accent)]">
+          <select value={symbol} onChange={(event) => { setSymbol(event.target.value as (typeof SYMBOLS)[number]); setLoading(true); setError(""); setActiveIndex(null); }} className="rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 py-2 font-semibold text-[var(--text)] outline-none focus:ring-2 focus:ring-[var(--accent)]">
             {SYMBOLS.map((item) => <option key={item} value={item}>{item}</option>)}
           </select>
         </label>
@@ -97,7 +94,7 @@ export default function HistoricalMarketChart() {
       <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
         <div className="flex gap-1 rounded-xl border border-[var(--border)] bg-[var(--surface-soft)] p-1" aria-label="Chart time range">
           {RANGES.map((item) => (
-            <button key={item} type="button" aria-pressed={range === item} onClick={() => setRange(item)} className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${range === item ? "bg-[var(--accent)] text-white" : "text-[var(--text-muted)] hover:text-[var(--text)]"}`}>{item}</button>
+            <button key={item} type="button" aria-pressed={range === item} onClick={() => { setRange(item); setLoading(true); setError(""); setActiveIndex(null); }} className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${range === item ? "bg-[var(--accent)] text-white" : "text-[var(--text-muted)] hover:text-[var(--text)]"}`}>{item}</button>
           ))}
         </div>
         {chart && !loading && <div className={`text-sm font-semibold ${totalReturn >= 0 ? "text-[var(--success)]" : "text-[var(--danger)]"}`}>{formatReturn(totalReturn)} <span className="font-normal text-[var(--text-faint)]">over {range}</span></div>}
