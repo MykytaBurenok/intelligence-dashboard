@@ -7,6 +7,7 @@ import Sidebar from "@/components/layout/Sidebar";
 import ImpactCard from "@/components/cards/ImpactCard";
 import ScenarioCard from "@/components/cards/ScenarioCard";
 import NewsFeed from "@/components/home/NewsFeed";
+import { matchesNewsTopic } from "@/lib/dashboard-logic.mjs";
 import type { AIBrief, DashboardArticle } from "@/types/dashboard";
 
 type MetricItem = {
@@ -80,9 +81,9 @@ export default function HomeDashboardClient({
     return articles.filter((article) => {
       const haystack = [article.title, article.description, article.source]
         .filter(Boolean).join(" ").toLowerCase();
-      return (!normalized || haystack.includes(normalized));
+      return (!normalized || haystack.includes(normalized)) && matchesNewsTopic(article, activeFilter);
     }).length;
-  }, [articles, query]);
+  }, [articles, query, activeFilter]);
 
   return (
     <Shell
@@ -132,7 +133,7 @@ export default function HomeDashboardClient({
               <h2 className="mt-1 text-xl font-semibold text-[var(--text)]">Market Snapshot</h2>
             </div>
             <p className="text-sm text-[var(--text-muted)]">
-              Latest successful provider responses · {new Date(generatedAt).toLocaleString()}
+              Latest successful provider responses · {`${new Date(generatedAt).toISOString().replace("T", " ").slice(0, 16)} UTC`}
             </p>
           </div>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 2xl:grid-cols-4">
