@@ -34,7 +34,7 @@ export default async function HomePage() {
         : 0,
     },
     {
-      label: "Commodities / ETF",
+      label: "Market ETF",
       name: secondaryQuote?.symbol ?? "Secondary quote",
       value: secondaryQuote ? secondaryQuote.current.toFixed(2) : "Unavailable",
       change: secondaryQuote
