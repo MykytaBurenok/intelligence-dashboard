@@ -8,6 +8,7 @@ import EventCard from "@/components/cards/EventCard";
 import ImpactCard from "@/components/cards/ImpactCard";
 import ScenarioCard from "@/components/cards/ScenarioCard";
 import NewsSwitcher from "@/components/layout/NewsSwitcher";
+import { matchesNewsTopic } from "@/lib/dashboard-logic.mjs";
 import type { AIBrief, DashboardArticle } from "@/types/dashboard";
 
 type MetricItem = {
@@ -36,19 +37,6 @@ type HomeDashboardClientProps = {
 
 const NEWS_FILTERS: NewsFilter[] = ["All news", "Macro", "Markets", "Technology"];
 
-function matchesFilter(article: DashboardArticle, filter: NewsFilter) {
-  if (filter === "All news") return true;
-
-  const text = `${article.title} ${article.description} ${article.source}`.toLowerCase();
-  const terms: Record<Exclude<NewsFilter, "All news">, RegExp> = {
-    Macro: /inflation|federal reserve|\bfed\b|interest rate|central bank|econom(y|ic)|gdp|jobs report|treasury|bond yield|monetary policy|cpi|pce/,
-    Markets: /stock|equity|market|shares|s&p|nasdaq|dow jones|\betf\b|bond|yield|dollar|gold|oil|crude|forex|bitcoin/,
-    Technology: /artificial intelligence|\bai\b|technology|tech|chip|semiconductor|software|cyber|data center|cloud computing/,
-  };
-
-  return terms[filter].test(text);
-}
-
 export default function HomeDashboardClient({
   articles,
   generatedAt,
@@ -71,7 +59,7 @@ export default function HomeDashboardClient({
         .toLowerCase();
 
       return (!normalized || haystack.includes(normalized)) &&
-        matchesFilter(article, activeFilter);
+        matchesNewsTopic(article, activeFilter);
     });
   }, [articles, query, activeFilter]);
 
