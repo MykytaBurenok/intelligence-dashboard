@@ -7,10 +7,12 @@ A market and news monitoring dashboard built with Next.js, React, TypeScript, an
 - Market quotes from Finnhub for a configurable list of symbols.
 - News articles from NewsAPI.
 - A compact AI-generated summary from Groq when configured.
+- A horizontally scrollable news feed with selected-story details, story pagination, and provider-backed page loading.
 - Search and keyword-based Macro, Markets, and Technology news filters.
 - Browser-persisted watchlist.
 - Market overview, signals, narrative summaries, scenario status, and settings pages.
-- Theme switching and responsive layouts.
+- Browser-persisted theme, default topic, and feed-density preferences.
+- Responsive desktop sidebar and mobile navigation drawer.
 
 ## Data integrity notes
 
@@ -67,7 +69,7 @@ npm run build  # Create a production build
 npm run start  # Serve a production build
 ```
 
-Core dashboard rules have automated unit tests using Node.js built-in test runner. Run `npm test` to execute them and `npm run typecheck` to check TypeScript types. GitHub Actions runs tests, type checking, lint, and a production build for pull requests and pushes to `main`.
+Core dashboard rules, including news pagination boundaries, have automated unit tests using Node.js built-in test runner. Run `npm test` to execute them and `npm run typecheck` to check TypeScript types. GitHub Actions runs tests, dependency audit, type checking, lint, and a production build for pull requests and pushes to `main`.
 
 ## Architecture
 
@@ -84,7 +86,7 @@ The application uses server-rendered data fetching for provider requests and cli
 - Scenario probabilities and calibrated market forecasts are not implemented.
 - Topic filters use lightweight keyword matching rather than a trained classifier.
 - The watchlist is stored in the current browser and is not synchronized across devices.
-- Settings groups document current and planned behavior; not every listed preference is interactive.
+- Theme and feed preferences are stored in the current browser; they are not synchronized across devices.
 - Provider rate limits and API plan restrictions may affect data availability.
 
 ## Deployment
