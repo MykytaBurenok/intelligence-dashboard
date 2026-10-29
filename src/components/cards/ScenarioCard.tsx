@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import type { AIBrief } from "@/types/dashboard";
 
 type Props = {
@@ -5,6 +8,30 @@ type Props = {
   isLoading?: boolean;
   analysisError?: string;
 };
+
+function TypedText({ text, className = "" }: { text: string; className?: string }) {
+  const [visibleLength, setVisibleLength] = useState(0);
+
+  useEffect(() => {
+    let length = 0;
+    const step = Math.max(1, Math.ceil(text.length / 100));
+    const timer = window.setInterval(() => {
+      length = Math.min(text.length, length + step);
+      setVisibleLength(length);
+      if (length >= text.length) window.clearInterval(timer);
+    }, window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 1 : 14);
+    return () => window.clearInterval(timer);
+  }, [text]);
+
+  return (
+    <span className={className} aria-label={text}>
+      <span aria-hidden="true">{text.slice(0, visibleLength)}</span>
+      {visibleLength < text.length && (
+        <span className="typewriter-caret" aria-hidden="true">▍</span>
+      )}
+    </span>
+  );
+}
 
 export default function ScenarioCard({
   aiBrief,
@@ -27,7 +54,9 @@ export default function ScenarioCard({
           {aiBrief.featuredTitle || "Select a story"}
         </h2>
         <h3 className="mt-4 text-sm font-semibold text-[var(--text)]">What this means</h3>
-        <p className="mt-2 text-sm leading-6 text-[var(--text-muted)]">{aiBrief.whatThisMeans}</p>
+        <p className="mt-2 text-sm leading-6 text-[var(--text-muted)]">
+          <TypedText key={aiBrief.whatThisMeans} text={aiBrief.whatThisMeans} />
+        </p>
         {analysisError && (
           <p className="mt-3 text-xs leading-5 text-[var(--text-faint)]" role="status">{analysisError}</p>
         )}
@@ -40,7 +69,7 @@ export default function ScenarioCard({
             {aiBrief.keyTakeaways.map((item, index) => (
               <li key={`${index}-${item}`} className="flex gap-3">
                 <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--accent)]" />
-                <span>{item}</span>
+                <span><TypedText key={item} text={item} /></span>
               </li>
             ))}
           </ul>
