@@ -51,6 +51,7 @@ export default function Sidebar() {
               href={href}
               aria-current={isActive ? "page" : undefined}
               aria-label={`${label}: ${description}`}
+              title={`${label}: ${description}`}
               className={`flex w-full items-center gap-3 rounded-xl border px-3 py-2.5 text-left transition ${
                 isActive
                   ? "border-[var(--border-strong)] bg-[var(--surface-strong)] text-[var(--text)] shadow-[var(--shadow-accent)]"
@@ -69,7 +70,7 @@ export default function Sidebar() {
         })}
       </nav>
 
-      <section className="panel p-4" aria-label="Watchlist">
+      <section className="sidebar-watchlist panel hidden p-4 xl:block" aria-label="Watchlist">
         <div className="flex items-center gap-2">
           <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[var(--surface-soft)] text-[var(--accent)]">
             <Bookmark size={15} strokeWidth={1.8} />
