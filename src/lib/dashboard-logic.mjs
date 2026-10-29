@@ -58,3 +58,19 @@ export function matchesNewsTopic(article, filter) {
     .join(" ");
   return pattern.test(text);
 }
+
+export function getNewsPageMeta(page, pageSize, totalResults, articleCount) {
+  const safePage = Math.min(100, Math.max(1, Math.floor(page)));
+  const safePageSize = Math.min(100, Math.max(1, Math.floor(pageSize)));
+  const safeTotalResults =
+    typeof totalResults === "number" && Number.isFinite(totalResults)
+      ? Math.max(0, Math.floor(totalResults))
+      : 0;
+
+  return {
+    page: safePage,
+    pageSize: safePageSize,
+    totalResults: safeTotalResults,
+    hasMore: safePage * safePageSize < safeTotalResults && articleCount > 0,
+  };
+}
