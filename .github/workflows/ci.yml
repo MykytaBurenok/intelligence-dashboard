@@ -18,21 +18,8 @@ jobs:
           cache: npm
       - name: Install dependencies
         run: npm ci
-      - name: Report dependency audit findings
-        run: |
-          npm audit --json > /tmp/npm-audit.json || true
-          node -e 'const a = require("/tmp/npm-audit.json"); console.log(JSON.stringify({metadata: a.metadata?.vulnerabilities, vulnerabilities: Object.entries(a.vulnerabilities ?? {}).map(([name, v]) => ({name, severity: v.severity, direct: v.isDirect, fixAvailable: v.fixAvailable, via: v.via.map(x => typeof x === "string" ? x : {name: x.name, title: x.title, range: x.range})}))}, null, 2))'
-      - name: Trial compatible dependency security updates
-        run: |
-          npm install next@16.4.3 eslint-config-next@16.4.3
-          npm audit fix
-      - name: Upload updated dependency manifests
-        uses: actions/upload-artifact@v4
-        with:
-          name: dependency-security-update
-          path: |
-            package.json
-            package-lock.json
+      - name: Audit dependencies
+        run: npm audit --audit-level=moderate
       - name: Run business logic tests
         run: npm test
       - name: Run TypeScript check
