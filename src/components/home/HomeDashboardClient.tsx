@@ -115,7 +115,7 @@ export default function HomeDashboardClient({
           <div>
             <p className="dashboard-kicker">Reality Shift Monitor</p>
             <h2 className="mt-2 max-w-2xl text-2xl font-semibold tracking-normal text-[var(--text)] sm:text-3xl">
-              Top Reality Shifts Today
+              Latest News Snapshot
             </h2>
             <p className="mt-3 max-w-2xl text-sm leading-6 text-[var(--text-muted)]">
               Current news, market data, and an AI-generated briefing. Categories
@@ -161,7 +161,7 @@ export default function HomeDashboardClient({
             <div>
               <p className="dashboard-kicker">Live Analytics</p>
               <h2 className="mt-1 text-xl font-semibold text-[var(--text)]">
-                Market Impact Overview
+                Market Snapshot
               </h2>
             </div>
             <p className="text-sm text-[var(--text-muted)]">
