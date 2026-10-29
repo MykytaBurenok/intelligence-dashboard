@@ -6,6 +6,7 @@ import {
   normalizeWatchlist,
   normalizeNewsArticles,
   matchesNewsTopic,
+  getNewsPageMeta,
 } from "../src/lib/dashboard-logic.mjs";
 
 test("Finnhub quote validation accepts finite zero moves but rejects empty provider payloads", () => {
@@ -54,4 +55,19 @@ test("topic filters classify matching text and leave unrelated text out", () => 
   assert.equal(matchesNewsTopic(article, "Technology"), false);
   assert.equal(matchesNewsTopic(article, "All news"), true);
   assert.equal(matchesNewsTopic(article, "unknown"), false);
+});
+
+test("news pagination metadata handles boundaries and empty pages", () => {
+  assert.deepEqual(getNewsPageMeta(1, 8, 17, 8), {
+    page: 1, pageSize: 8, totalResults: 17, hasMore: true,
+  });
+  assert.deepEqual(getNewsPageMeta(3, 8, 17, 1), {
+    page: 3, pageSize: 8, totalResults: 17, hasMore: false,
+  });
+  assert.deepEqual(getNewsPageMeta(0, 8, 17, 8), {
+    page: 1, pageSize: 8, totalResults: 17, hasMore: true,
+  });
+  assert.deepEqual(getNewsPageMeta(1, 8, Number.NaN, 0), {
+    page: 1, pageSize: 8, totalResults: 0, hasMore: false,
+  });
 });
