@@ -1,4 +1,5 @@
 import { requestJson, requireEnv } from "@/lib/api/client";
+import { normalizeNewsArticles } from "@/lib/dashboard-logic.mjs";
 import type { DashboardArticle } from "@/types/dashboard";
 
 type NewsApiArticle = {
@@ -46,23 +47,5 @@ export async function fetchNews({
     throw new Error("NewsAPI returned an unsuccessful status");
   }
 
-  return (Array.isArray(data.articles) ? data.articles : [])
-    .filter(
-      (article) =>
-        typeof article.title === "string" &&
-        article.title.trim().length > 0 &&
-        typeof article.url === "string" &&
-        article.url.trim().length > 0,
-    )
-    .map((article) => ({
-      title: article.title!.trim(),
-      source: article.source?.name?.trim() || "Unknown source",
-      url: article.url!,
-      publishedAt:
-        typeof article.publishedAt === "string" &&
-        !Number.isNaN(Date.parse(article.publishedAt))
-          ? article.publishedAt
-          : "",
-      description: typeof article.description === "string" ? article.description : "",
-    }));
+  return normalizeNewsArticles(data.articles);
 }
