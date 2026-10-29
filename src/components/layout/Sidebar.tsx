@@ -51,11 +51,11 @@ export default function Sidebar() {
               href={href}
               aria-current={isActive ? "page" : undefined}
               aria-label={`${label}: ${description}`}
-              className={\`flex w-full items-center gap-3 rounded-xl border px-3 py-2.5 text-left transition \${
+              className={`flex w-full items-center gap-3 rounded-xl border px-3 py-2.5 text-left transition ${
                 isActive
                   ? "border-[var(--border-strong)] bg-[var(--surface-strong)] text-[var(--text)] shadow-[var(--shadow-accent)]"
                   : "border-transparent text-[var(--text-muted)] hover:border-[var(--border)] hover:bg-[var(--surface-soft)] hover:text-[var(--text)]"
-              }\`}
+              }`}
             >
               <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[var(--surface-soft)] text-[var(--accent)]">
                 <Icon size={14} strokeWidth={1.75} />
@@ -88,7 +88,7 @@ export default function Sidebar() {
                 <button
                   type="button"
                   onClick={() => removeItem(item)}
-                  aria-label={\`Remove \${item} from watchlist\`}
+                  aria-label={`Remove ${item} from watchlist`}
                   className="shrink-0 rounded-lg border border-transparent px-2 py-1 text-xs text-[var(--text-muted)] transition hover:border-[var(--border)] hover:bg-[var(--surface-strong)] hover:text-[var(--text)]"
                 >
                   Remove
