@@ -146,7 +146,7 @@ export default function NewsFeed({
           <p className="dashboard-kicker">News Feed</p>
           <h2 className="mt-1 text-xl font-semibold text-[var(--text)]">Latest coverage</h2>
           <p className="mt-1 text-sm text-[var(--text-muted)]">
-            {filteredArticles.length} loaded · Select a story to inspect it
+            {filteredArticles.length} matching stories · {articles.length} loaded
           </p>
         </div>
         {showFilters ? (
