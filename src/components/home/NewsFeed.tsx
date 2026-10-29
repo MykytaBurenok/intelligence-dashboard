@@ -52,8 +52,8 @@ export default function NewsFeed({
 }: NewsFeedProps) {
   const [articles, setArticles] = useState(initialArticles);
   const [selectedUrl, setSelectedUrl] = useState(initialArticles[0]?.url ?? "");
-  const [nextApiPage, setNextApiPage] = useState(2);
-  const [hasMore, setHasMore] = useState(initialArticles.length >= PAGE_SIZE);
+  const [nextApiPage, setNextApiPage] = useState(initialArticles.length === 0 ? 1 : 2);
+  const [hasMore, setHasMore] = useState(initialArticles.length === 0 || initialArticles.length >= PAGE_SIZE);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const stripRef = useRef<HTMLDivElement>(null);
@@ -102,7 +102,7 @@ export default function NewsFeed({
         const currentUrls = new Set(current.map((article) => article.url));
         return [...current, ...added.filter((article) => !currentUrls.has(article.url))];
       });
-      setHasMore(payload.hasMore && payload.articles.length > 0);
+      setHasMore(payload.hasMore && added.length > 0);
       setNextApiPage(payload.page + 1);
       return added;
     } catch (cause) {
