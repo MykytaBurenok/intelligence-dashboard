@@ -15,7 +15,10 @@ A market and news monitoring dashboard built with Next.js, React, TypeScript, an
 - Market overview, signals, narrative summaries, scenario status, and settings pages.
 - Browser-persisted theme, default topic, and feed-density preferences.
 - Responsive desktop sidebar and mobile navigation drawer.
-- Lightweight CSS motion for page entry, chart drawing, and control feedback, with `prefers-reduced-motion` support.
+- Layered ambient background, subtle card sheen, staggered page entrance, animated chart drawing, and custom accent-colored scrollbars.
+- Resizable desktop navigation and intelligence side panels with keyboard controls and browser-persisted widths.
+- Live type-on effect for selected-story AI analysis, with a reduced-motion fallback.
+- CSS-first motion and interactive transitions with `prefers-reduced-motion` support.
 
 ## Data integrity notes
 
