@@ -47,7 +47,7 @@ export default function Sidebar() {
         </div>
       </div>
 
-      <nav className="grid gap-2">
+      <nav className="grid gap-2" aria-label="Main navigation">
         {navItems.map(({ label, href, icon: Icon }) => {
           const isActive =
             href === "/" ? pathname === "/" : pathname.startsWith(href);
@@ -56,6 +56,7 @@ export default function Sidebar() {
             <Link
               key={label}
               href={href}
+              aria-current={isActive ? "page" : undefined}
               className={`flex w-full items-center gap-3 rounded-xl border px-3 py-2.5 text-left text-sm font-medium transition ${
                 isActive
                   ? "border-[var(--border-strong)] bg-[var(--surface-strong)] text-[var(--text)] shadow-[var(--shadow-accent)]"
@@ -77,12 +78,8 @@ export default function Sidebar() {
             <Bookmark size={15} strokeWidth={1.8} />
           </span>
           <div>
-            <p className="text-sm font-semibold text-[var(--text)]">
-              Watchlist
-            </p>
-            <p className="text-xs text-[var(--text-faint)]">
-              Saved items for tracking
-            </p>
+            <p className="text-sm font-semibold text-[var(--text)]">Watchlist</p>
+            <p className="text-xs text-[var(--text-faint)]">Saved items for tracking</p>
           </div>
         </div>
 
@@ -98,7 +95,9 @@ export default function Sidebar() {
                     {item}
                   </p>
                   <button
+                    type="button"
                     onClick={() => removeItem(item)}
+                    aria-label={`Remove ${item} from watchlist`}
                     className="shrink-0 rounded-lg border border-transparent px-2 py-1 text-xs text-[var(--text-muted)] transition hover:border-[var(--border)] hover:bg-[var(--surface-strong)] hover:text-[var(--text)]"
                   >
                     Remove
@@ -108,9 +107,7 @@ export default function Sidebar() {
             ))
           ) : (
             <div className="rounded-xl border border-dashed border-[var(--border)] bg-[var(--surface-soft)] p-3">
-              <p className="text-sm text-[var(--text-muted)]">
-                Nothing watched yet.
-              </p>
+              <p className="text-sm text-[var(--text-muted)]">Nothing watched yet.</p>
               <p className="mt-1 text-xs leading-5 text-[var(--text-faint)]">
                 Use the Watch button on articles or signals to save them here.
               </p>
@@ -119,22 +116,10 @@ export default function Sidebar() {
         </div>
       </div>
 
-      <div className="panel hidden p-4 xl:block">
-        <p className="dashboard-kicker">Signal Health</p>
-        <p className="mt-3 text-2xl font-semibold text-[var(--text)]">94.2</p>
-        <div className="mt-3 h-1 rounded-full bg-[var(--surface-strong)]">
-          <div className="metric-line h-full w-[78%] rounded-full" />
-        </div>
-        <p className="mt-3 text-xs leading-5 text-[var(--text-muted)]">
-          Cross-source confidence remains elevated across macro and policy
-          clusters.
-        </p>
-      </div>
-
       <div className="hidden rounded-2xl border border-[var(--border)] bg-[var(--surface-soft)] p-3 xl:block">
-        <p className="text-sm font-semibold text-[var(--text)]">Nikita</p>
+        <p className="text-sm font-semibold text-[var(--text)]">Research workspace</p>
         <p className="mt-1 text-xs text-[var(--text-faint)]">
-          Research workspace
+          Market and news monitoring
         </p>
       </div>
     </div>
