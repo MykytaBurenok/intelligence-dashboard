@@ -22,6 +22,8 @@ export function WatchlistProvider({ children }: { children: React.ReactNode }) {
     try {
       const stored = window.localStorage.getItem(STORAGE_KEY);
       if (stored) {
+        // Reading browser storage after hydration avoids server/client markup mismatches.
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setItems(normalizeWatchlist(JSON.parse(stored)));
       }
     } catch {
