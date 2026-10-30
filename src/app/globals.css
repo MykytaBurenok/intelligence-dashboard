@@ -948,3 +948,82 @@ button:active:not(:disabled) { transform: scale(.985); }
   body::before { animation: none; }
   .card:hover { transform: none; }
 }
+
+
+/* Fixed-feeling workspace rails: each side panel scrolls independently of the page. */
+:root {
+  --ambient-x: -1.5%;
+  --ambient-y: -1%;
+}
+
+body::before {
+  transform: translate3d(var(--ambient-x), var(--ambient-y), 0) scale(1.03);
+  animation: none;
+  will-change: transform;
+}
+
+html,
+body {
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+.shell-frame,
+.shell-grid,
+.shell-content,
+.shell-main {
+  min-width: 0;
+  max-width: 100%;
+}
+
+@media (min-width: 768px) {
+  .shell-grid {
+    grid-template-columns: var(--sidebar-size, 88px) minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .shell-sidebar {
+    position: sticky;
+    top: 0;
+    align-self: start;
+    height: 100vh;
+    height: 100dvh;
+    max-height: 100vh;
+    max-height: 100dvh;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-gutter: stable;
+  }
+}
+
+@media (min-width: 1280px) {
+  .shell-grid {
+    grid-template-columns: var(--sidebar-size, 240px) minmax(0, 1fr) var(--right-panel-size, 320px);
+    align-items: start;
+  }
+
+  .shell-sidebar,
+  .shell-right-panel {
+    position: sticky;
+    top: 0;
+    align-self: start;
+    height: 100vh;
+    height: 100dvh;
+    max-height: 100vh;
+    max-height: 100dvh;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-gutter: stable;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body::before {
+    transform: none;
+    will-change: auto;
+  }
+}
