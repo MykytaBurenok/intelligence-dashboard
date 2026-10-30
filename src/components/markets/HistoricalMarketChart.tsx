@@ -24,6 +24,11 @@ function formatReturn(value: number) {
   return `${value > 0 ? "+" : ""}${value.toFixed(2)}%`;
 }
 
+function formatChange(value: number) {
+  const sign = value > 0 ? "+" : value < 0 ? "−" : "";
+  return `${sign}${formatPrice(Math.abs(value))}`;
+}
+
 export default function HistoricalMarketChart() {
   const [symbol, setSymbol] = useState<(typeof SYMBOLS)[number]>("SPY");
   const [range, setRange] = useState<RangeKey>("3M");
