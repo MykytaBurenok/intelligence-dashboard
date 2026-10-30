@@ -23,7 +23,7 @@ export default function Header({
 
   return (
     <div className="flex items-center justify-between gap-4">
-      <div className="flex min-w-0 max-w-md flex-1 items-center gap-3">
+      <div className="hidden min-w-0 max-w-md flex-1 items-center gap-3 sm:flex">
         <div className="hidden h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--surface-soft)] text-[var(--accent)] sm:flex">
           <span className="text-sm font-semibold">AI</span>
         </div>

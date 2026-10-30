@@ -195,7 +195,9 @@ export default function HomeDashboardClient({
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 2xl:grid-cols-4">
             {metrics.map((item) => <ImpactCard key={item.name} {...item} />)}
           </div>
-          <HistoricalMarketChart />
+          <div className="mt-6">
+            <HistoricalMarketChart />
+          </div>
         </section>
 
         <section aria-labelledby="news-coverage-title" className="space-y-3">
