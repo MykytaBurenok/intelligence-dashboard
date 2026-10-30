@@ -85,7 +85,7 @@ export default function SettingsClient() {
                 setDefaultFilter(value);
                 savePreferences(value, density);
               }}
-              className="rounded-xl border border-[var(--border)] bg-[var(--surface-soft)] px-3 py-3"
+              className="themed-select w-full rounded-xl px-3 py-3"
             >
               {filters.map((filter) => <option key={filter} value={filter}>{filter}</option>)}
             </select>
