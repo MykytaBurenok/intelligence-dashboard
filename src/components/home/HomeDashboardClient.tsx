@@ -7,6 +7,7 @@ import Sidebar from "@/components/layout/Sidebar";
 import ImpactCard from "@/components/cards/ImpactCard";
 import ScenarioCard from "@/components/cards/ScenarioCard";
 import NewsFeed from "@/components/home/NewsFeed";
+import HistoricalMarketChart from "@/components/markets/HistoricalMarketChart";
 import { matchesNewsTopic } from "@/lib/dashboard-logic.mjs";
 import type { AIBrief, DashboardArticle, DashboardBrief } from "@/types/dashboard";
 
@@ -181,16 +182,6 @@ export default function HomeDashboardClient({
           </div>
         </section>
 
-        <NewsFeed
-          initialArticles={articles}
-          query={query}
-          activeFilter={activeFilter}
-          onFilterChange={setActiveFilter}
-          onArticleChange={onArticleChange}
-          showFilters
-          density={density}
-        />
-
         <section>
           <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
             <div>
@@ -204,6 +195,24 @@ export default function HomeDashboardClient({
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 2xl:grid-cols-4">
             {metrics.map((item) => <ImpactCard key={item.name} {...item} />)}
           </div>
+          <HistoricalMarketChart />
+        </section>
+
+        <section aria-labelledby="news-coverage-title" className="space-y-3">
+          <div>
+            <p className="dashboard-kicker">Signal discovery</p>
+            <h2 id="news-coverage-title" className="mt-1 text-xl font-semibold text-[var(--text)]">Latest News &amp; Coverage</h2>
+            <p className="mt-2 text-sm text-[var(--text-muted)]">Search and filter provider-sourced stories. Topic labels are heuristic, not verified market signals.</p>
+          </div>
+          <NewsFeed
+            initialArticles={articles}
+            query={query}
+            activeFilter={activeFilter}
+            onFilterChange={setActiveFilter}
+            onArticleChange={onArticleChange}
+            showFilters
+            density={density}
+          />
         </section>
       </div>
     </Shell>
