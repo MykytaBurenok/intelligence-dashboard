@@ -76,7 +76,8 @@ export default function HistoricalMarketChart() {
   }, [data]);
 
   const selectedPoint = chart && activeIndex !== null ? chart.coords[activeIndex] : null;
-  const absoluteChange = chart ? chart.last.close - chart.first.close : 0;\n  const totalReturn = chart ? ((chart.last.close / chart.first.close) - 1) * 100 : 0;
+  const absoluteChange = chart ? chart.last.close - chart.first.close : 0;
+  const totalReturn = chart ? ((chart.last.close / chart.first.close) - 1) * 100 : 0;
 
   return (
     <section className="card overflow-hidden p-4 sm:p-6" aria-labelledby="historical-chart-title">
