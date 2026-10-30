@@ -204,7 +204,15 @@ export default function HomeDashboardClient({
             <h2 id="news-coverage-title" className="mt-1 text-xl font-semibold text-[var(--text)]">Latest News &amp; Coverage</h2>
             <p className="mt-2 text-sm text-[var(--text-muted)]">Search and filter provider-sourced stories. Topic labels are heuristic, not verified market signals.</p>
           </div>
-
+          <NewsFeed
+            initialArticles={articles}
+            query={query}
+            activeFilter={activeFilter}
+            onFilterChange={setActiveFilter}
+            onArticleChange={onArticleChange}
+            showFilters
+            density={density}
+          />
         </section>
       </div>
     </Shell>
