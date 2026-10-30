@@ -24,6 +24,11 @@ function formatReturn(value: number) {
   return `${value > 0 ? "+" : ""}${value.toFixed(2)}%`;
 }
 
+function formatChange(value: number) {
+  const sign = value > 0 ? "+" : value < 0 ? "−" : "";
+  return `${sign}${formatPrice(Math.abs(value))}`;
+}
+
 export default function HistoricalMarketChart() {
   const [symbol, setSymbol] = useState<(typeof SYMBOLS)[number]>("SPY");
   const [range, setRange] = useState<RangeKey>("3M");
@@ -39,6 +44,9 @@ export default function HistoricalMarketChart() {
       .then(async (response) => {
         const payload = (await response.json()) as HistoryResponse;
         if (!response.ok) throw new Error(payload.error || "Historical data could not be loaded.");
+        if (!Array.isArray(payload.points) || payload.points.length < 2) {
+          throw new Error("The market data providers returned no usable historical prices.");
+        }
         return payload;
       })
       .then((payload) => setData(payload))
@@ -73,6 +81,7 @@ export default function HistoricalMarketChart() {
   }, [data]);
 
   const selectedPoint = chart && activeIndex !== null ? chart.coords[activeIndex] : null;
+  const absoluteChange = chart ? chart.last.close - chart.first.close : 0;
   const totalReturn = chart ? ((chart.last.close / chart.first.close) - 1) * 100 : 0;
 
   return (
@@ -81,7 +90,7 @@ export default function HistoricalMarketChart() {
         <div>
           <p className="dashboard-kicker">Historical performance</p>
           <h2 id="historical-chart-title" className="mt-1 text-xl font-semibold text-[var(--text)]">Price history</h2>
-          <p className="mt-1 text-sm text-[var(--text-muted)]">Daily closing prices · source: Finnhub</p>
+          <p className="mt-1 text-sm text-[var(--text-muted)]">Daily closing prices · source: {data?.source ?? "market data providers"}</p>
         </div>
         <label className="flex items-center gap-2 text-sm text-[var(--text-muted)]">
           <span>Asset</span>
@@ -97,7 +106,7 @@ export default function HistoricalMarketChart() {
             <button key={item} type="button" aria-pressed={range === item} onClick={() => { setRange(item); setLoading(true); setError(""); setActiveIndex(null); }} className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${range === item ? "bg-[var(--accent)] text-white" : "text-[var(--text-muted)] hover:text-[var(--text)]"}`}>{item}</button>
           ))}
         </div>
-        {chart && !loading && <div className={`text-sm font-semibold ${totalReturn >= 0 ? "text-[var(--success)]" : "text-[var(--danger)]"}`}>{formatReturn(totalReturn)} <span className="font-normal text-[var(--text-faint)]">over {range}</span></div>}
+        {chart && !loading && <div className={`text-sm font-semibold ${totalReturn >= 0 ? "text-[var(--success)]" : "text-[var(--danger)]"}`}>{formatReturn(totalReturn)} <span className="font-normal text-[var(--text-faint)]">({formatChange(absoluteChange)}) over {range}</span></div>}
       </div>
 
       <div className="relative mt-4 min-h-[220px]">
@@ -110,7 +119,7 @@ export default function HistoricalMarketChart() {
           <div className="flex min-h-[260px] flex-col items-center justify-center rounded-xl border border-dashed border-[var(--border)] px-6 text-center">
             <p className="text-sm font-semibold text-[var(--text)]">Historical data unavailable</p>
             <p className="mt-2 max-w-md text-sm leading-6 text-[var(--text-muted)]">{error}</p>
-            <p className="mt-2 text-xs text-[var(--text-faint)]">Check that FINNHUB_KEY is configured and the provider supports this symbol.</p>
+            <p className="mt-2 text-xs text-[var(--text-faint)]">The chart tries Finnhub first, then Yahoo Finance. Both providers may temporarily limit requests.</p>
           </div>
         ) : chart ? (
           <>
@@ -129,7 +138,7 @@ export default function HistoricalMarketChart() {
               <div><p className="text-xs text-[var(--text-faint)]">Latest close</p><p className="mt-1 text-sm font-semibold text-[var(--text)]">{formatPrice(chart.last.close)}</p></div>
               <div><p className="text-xs text-[var(--text-faint)]">Period high</p><p className="mt-1 text-sm font-semibold text-[var(--text)]">{formatPrice(chart.max)}</p></div>
             </div>
-            <p className="mt-4 text-xs leading-5 text-[var(--text-faint)]">Daily closes are historical observations, not real-time ticks. Returns are calculated from the first and last available closes in this response. {data?.fetchedAt ? `Fetched ${new Date(data.fetchedAt).toLocaleString()}.` : ""}</p>
+            <p className="mt-4 text-xs leading-5 text-[var(--text-faint)]">Daily closes are historical observations, not real-time ticks. Change is calculated from the first and last available closes returned by the provider; missing sessions are not interpolated. {data?.fetchedAt ? `Last fetched ${new Date(data.fetchedAt).toLocaleString()}.` : ""}</p>
           </>
         ) : null}
       </div>

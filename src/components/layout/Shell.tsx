@@ -9,8 +9,8 @@ type ShellProps = { sidebar: ReactNode; header: ReactNode; rightPanel: ReactNode
 type ResizeTarget = "left" | "right";
 type ResizeSession = { target: ResizeTarget; startX: number; startWidth: number };
 
-const MIN_SIDEBAR = 88;
-const MAX_SIDEBAR = 400;
+const MIN_SIDEBAR = 220;
+const MAX_SIDEBAR = 340;
 const MIN_RIGHT_PANEL = 280;
 const MAX_RIGHT_PANEL = 460;
 
@@ -74,7 +74,7 @@ export default function Shell({ sidebar, header, rightPanel, children }: ShellPr
   const handlePointerDown = (target: ResizeTarget, event: ReactPointerEvent<HTMLButtonElement>) => {
     if (event.button !== 0) return;
     const currentWidth = target === "left"
-      ? sidebarWidth ?? (window.matchMedia("(min-width: 1280px)").matches ? 260 : 88)
+      ? sidebarWidth ?? (window.matchMedia("(min-width: 1280px)").matches ? 240 : 88)
       : rightPanelWidth ?? 320;
     resizeSession.current = { target, startX: event.clientX, startWidth: currentWidth };
     event.currentTarget.setPointerCapture(event.pointerId);
@@ -118,14 +118,14 @@ export default function Shell({ sidebar, header, rightPanel, children }: ShellPr
         <aside className="shell-sidebar" aria-label="Desktop sidebar">
           {sidebar}
           <button type="button" className="shell-resize-handle shell-resize-handle--left"
-            aria-label="Resize navigation sidebar. Use arrow keys to adjust, double click to reset." role="separator" aria-orientation="vertical" aria-valuemin={MIN_SIDEBAR} aria-valuemax={MAX_SIDEBAR} aria-valuenow={sidebarWidth ?? (typeof window !== "undefined" && window.matchMedia("(min-width: 1280px)").matches ? 260 : 88)}
+            aria-label="Resize navigation sidebar. Minimum width 220px. Use arrow keys to adjust, double click to reset." role="separator" aria-orientation="vertical" aria-valuemin={MIN_SIDEBAR} aria-valuemax={MAX_SIDEBAR} aria-valuenow={sidebarWidth ?? (typeof window !== "undefined" && window.matchMedia("(min-width: 1280px)").matches ? 240 : 88)}
             onPointerDown={(event) => handlePointerDown("left", event)} onPointerMove={handlePointerMove}
             onPointerUp={finishResize} onPointerCancel={finishResize} onDoubleClick={() => resetWidth("left")}
             onKeyDown={(event) => {
               if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
                 event.preventDefault();
                 const delta = event.key === "ArrowRight" ? 12 : -12;
-                const defaultWidth = window.matchMedia("(min-width: 1280px)").matches ? 260 : 88;
+                const defaultWidth = window.matchMedia("(min-width: 1280px)").matches ? 240 : 88;
                 const width = Math.min(MAX_SIDEBAR, Math.max(MIN_SIDEBAR, (sidebarWidth ?? defaultWidth) + delta));
                 setSidebarWidth(width); window.localStorage.setItem("reality-shift-sidebar-width", String(width));
               }
