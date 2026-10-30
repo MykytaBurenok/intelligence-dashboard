@@ -52,6 +52,20 @@ export default function Shell({ sidebar, header, rightPanel, children }: ShellPr
   useEffect(() => {
     const root = shellRef.current;
     if (!root || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const motion = gsap.to(document.documentElement, {
+      "--ambient-x": "2.5%",
+      "--ambient-y": "-1.8%",
+      duration: 12,
+      ease: "sine.inOut",
+      repeat: -1,
+      yoyo: true,
+    });
+    return () => motion.kill();
+  }, []);
+
+  useEffect(() => {
+    const root = shellRef.current;
+    if (!root || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     const context = gsap.context(() => {
       const timeline = gsap.timeline({ defaults: { ease: "power3.out" } });
