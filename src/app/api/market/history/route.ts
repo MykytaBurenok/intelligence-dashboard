@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ApiClientError, requestJson, requireEnv } from "@/lib/api/client";
-import { HISTORICAL_RANGE_DAYS, HISTORICAL_SYMBOLS, isSupportedHistoryRequest, normalizeHistoryPoints } from "@/lib/market-history.mjs";
+import { HISTORICAL_RANGE_DAYS, HISTORICAL_SYMBOLS, normalizeHistoryPoints } from "@/lib/market-history.mjs";
 
 export const dynamic = "force-dynamic";
 
@@ -18,7 +18,7 @@ type YahooChartResponse = {
 };
 
 function isRange(value: string | null): value is RangeKey {
-  return value !== null && Object.hasOwn(RANGE_DAYS, value);
+  return value !== null && Object.hasOwn(HISTORICAL_RANGE_DAYS, value);
 }
 
 
