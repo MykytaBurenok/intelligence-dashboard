@@ -1,44 +1,75 @@
 # Intelligence Dashboard
 
-A market and news monitoring dashboard built with Next.js, React, TypeScript, and Tailwind CSS. It combines current provider data with an AI-generated briefing in a responsive interface.
+A personal **market-intelligence workspace** that brings market quotes, financial news, historical price action, and AI-assisted context into one responsive dashboard.
 
-## Current capabilities
+Built as a portfolio project to demonstrate practical frontend engineering, API integration, data validation, resilient UI states, and thoughtful interaction design. It is a learning project, not a production financial service or investment-advice product.
 
-- Market quotes from Finnhub for a configurable list of symbols.
-- Historical daily closing-price charts for SPY, QQQ, GLD, and USO over 1M, 3M, and 1Y ranges, using Finnhub with Yahoo Finance as a fallback.
-- News articles from NewsAPI.
-- A compact AI-generated summary from Groq when configured.
-- A horizontally scrollable news feed with selected-story details, story pagination, and provider-backed page loading.
-- Article-specific AI analysis on the home dashboard, with publisher-description fallback when the AI provider is unavailable.
-- Search and keyword-based Macro, Markets, and Technology news filters.
-- Browser-persisted watchlist.
-- Market overview, signals, narrative summaries, scenario status, and settings pages.
-- Browser-persisted theme, default topic, and feed-density preferences.
-- Responsive desktop sidebar and mobile navigation drawer.
-- Layered ambient background, subtle card sheen, staggered page entrance, animated chart drawing, and custom accent-colored scrollbars.
-- Resizable desktop navigation and intelligence side panels with keyboard controls and browser-persisted widths.
-- Live type-on effect for selected-story AI analysis, with a reduced-motion fallback.
-- CSS-first motion and interactive transitions with `prefers-reduced-motion` support.
+> **Data integrity first:** market values and news are provider-backed. When a provider is unavailable or returns unusable data, the relevant feature should show an unavailable state instead of inventing prices or silently substituting demo values.
 
-## Data integrity notes
+## Product overview
 
-- Market values and articles are shown only when valid responses are returned by their providers.
-- Historical charts use daily candle close values from Finnhub, with Yahoo Finance as a fallback. The chart never generates or interpolates sample prices. If both providers fail or return insufficient observations, the chart shows an unavailable state.
-- Market Snapshot cards are global quotes and are not expected to change when a news story is selected.
-- The selected-story analysis updates when the selected article changes and uses its title and description as context.
-- The AI analysis does not fetch or verify the full linked article page. Its conclusions are limited to metadata and description supplied by the news provider.
-- The dashboard does not currently have a calibrated forecasting model. Scenario probabilities are therefore intentionally not displayed.
-- AI-reported confidence is a subjective language-model estimate, not a calibrated probability or investment recommendation.
-- News category filters use keyword matching and should not be interpreted as financial signals.
-- When a provider is unavailable or returns invalid data, the affected section may show an empty or unavailable state.
+The dashboard is designed to answer three quick questions:
 
-## Requirements
+- **What is moving?** Review the latest available quotes for a small set of market ETFs.
+- **What might matter?** Scan current news and filter it by macro, markets, and technology topics.
+- **What is the context?** Read a concise AI-assisted briefing and inspect historical closing-price behavior.
 
-- Node.js 20 or later recommended.
-- npm.
-- API keys for the data providers you want to use.
+### Current features
+
+- **Market snapshot** using Finnhub quotes for SPY, QQQ, GLD, and USO when the provider returns valid observations.
+- **Historical price chart** with 1M, 3M, and 1Y ranges, daily closes, percentage and absolute period change, provider attribution, last-fetch time, and explicit loading/error/empty states.
+- **Provider fallback** for historical data: Finnhub first, Yahoo Finance if Finnhub is unavailable or returns insufficient observations.
+- **News feed** powered by NewsAPI, including search, topic filters, pagination, feed-density preferences, and selected-story details.
+- **AI-assisted briefings** using Groq when configured. If AI analysis is unavailable, the UI falls back to publisher-provided metadata where possible and identifies the limitation.
+- **Persistent workspace preferences** for theme, watchlist, default topic, feed density, and desktop panel widths.
+- **Responsive navigation** with a desktop sidebar and mobile navigation drawer.
+- **Interactive UI** with resizable panels, animated chart drawing, staggered page transitions, ambient background motion, and reduced-motion support.
+
+## Screenshots
+
+Screenshots are intentionally left for the project author to add.
+
+<!-- Add product screenshots here when ready. -->
+
+## Architecture
+
+The project uses the Next.js App Router. Provider calls and API credentials stay on the server; client components handle interactions and visualization.
+
+| Area | Responsibility |
+| --- | --- |
+| `src/app` | App Router pages and API endpoints |
+| `src/app/api/market/history/route.ts` | Validates historical-chart parameters, requests provider data, normalizes observations, and applies caching |
+| `src/components/markets/HistoricalMarketChart.tsx` | Interactive historical-price visualization and period statistics |
+| `src/components/home` | Home overview, news feed, and article-specific interactions |
+| `src/components/layout` | Application shell, navigation, theme-aware header, and side panels |
+| `src/lib/api` | Shared HTTP client and provider integrations |
+| `src/lib/dashboard.ts` | Aggregates market quotes, news, and the AI briefing with graceful fallbacks |
+| `src/lib/dashboard-logic.mjs` | Reusable validation and business rules covered by unit tests |
+
+## Data sources and integrity
+
+| Data | Provider | Notes |
+| --- | --- | --- |
+| Market quotes | Finnhub | Only valid provider responses are included |
+| Historical daily closes | Finnhub, with Yahoo Finance fallback | The chart uses provider-returned observations; it does not synthesize or interpolate missing prices |
+| News articles | NewsAPI | Article content is limited to the metadata returned by the provider |
+| AI briefing | Groq, when configured | AI output is contextual assistance, not a calibrated forecast |
+
+Historical prices are daily closes, not real-time ticks. Markets are closed on weekends and holidays, and provider datasets can have missing sessions. The chart does not invent observations to fill those gaps. The source and fetch timestamp are shown so the user can judge data freshness.
+
+The application does **not** currently provide a calibrated forecasting model. Any model-reported confidence is subjective model output, not a statistical probability or investment recommendation. Keyword-based topic filters are navigation aids, not trading signals.
+
+API keys are read from server-side environment variables. Never put real credentials in source control or expose them through client-side code.
 
 ## Getting started
+
+### Requirements
+
+- Node.js 20 or later
+- npm
+- Provider API keys for the live features you want to use
+
+### Install
 
 ```bash
 git clone https://github.com/MykytaBurenok/intelligence-dashboard.git
@@ -47,61 +78,74 @@ npm install
 cp .env.example .env.local
 ```
 
-Add your provider keys to `.env.local`, then run the development server:
+Add the relevant keys to `.env.local`, then run the development server:
 
 ```bash
 npm run dev
 ```
 
-Open http://localhost:3000.
+Open [http://localhost:3000](http://localhost:3000).
 
-## Environment variables
+### Environment variables
 
-| Variable | Required | Purpose |
+| Variable | Needed for | Description |
 | --- | --- | --- |
-| `FINNHUB_KEY` | For market quotes | Finnhub API token |
-| `NEWSAPI_KEY` | For news articles | NewsAPI key |
-| `GROQ_API_KEY` | For AI briefing | Groq API key |
-| `GROQ_MODEL` | No | Optional Groq chat model override; defaults to `llama-3.1-8b-instant` |
+| `FINNHUB_KEY` | Market quotes and primary historical data | Finnhub API token |
+| `NEWSAPI_KEY` | News feed | NewsAPI key |
+| `GROQ_API_KEY` | AI briefing | Groq API key |
+| `GROQ_MODEL` | Optional | Overrides the default Groq chat model |
 
-Keep secrets in `.env.local` or your deployment provider's environment-variable settings. Never commit real API keys. The example file contains placeholders only.
+Yahoo Finance is used as a historical-data fallback and does not require a project API key. Provider availability, rate limits, and plan restrictions can affect live data. Without keys, the application can still render, but provider-backed features may show unavailable states.
 
-The app degrades to unavailable/empty data when a provider cannot be reached, so the dashboard can still render without all providers configured. Features requiring the missing provider will not return live data.
+## Quality checks
 
-## Scripts
+Run the checks locally before opening a pull request:
 
 ```bash
-npm run dev    # Start local development
-npm test       # Run business logic unit tests
-npm run typecheck # Check TypeScript types
-npm run lint   # Run ESLint
-npm run build  # Create a production build
-npm run start  # Serve a production build
+npm test
+npm run typecheck
+npm run lint
+npm run build
 ```
 
-Core dashboard rules, including news pagination boundaries, have automated unit tests using Node.js built-in test runner. Run `npm test` to execute them and `npm run typecheck` to check TypeScript types. GitHub Actions runs tests, dependency audit, type checking, lint, and a production build for pull requests and pushes to `main`.
+- `npm test` runs the Node.js test suite for reusable business rules.
+- `npm run typecheck` validates TypeScript types.
+- `npm run lint` runs ESLint.
+- `npm run build` checks whether Next.js can produce a production build.
 
-## Architecture
+GitHub Actions runs the repository's configured quality checks for pull requests and pushes to `main`. A successful local build or CI run is not proof that the hosted deployment is healthy; deployment status must be verified separately.
 
-- `src/app`: Next.js App Router pages and API routes.
-- `src/app/api/market/history/route.ts`: validated, cached historical candle endpoint with Finnhub and Yahoo Finance fallback.
-- `src/components/markets/HistoricalMarketChart.tsx`: interactive client-side SVG chart and period statistics.
-- `src/components`: dashboard shell, cards, navigation, and client-side interactions.
-- `src/lib/api`: external provider clients and request handling.
-- `src/lib/dashboard.ts`: server-side data aggregation and fallback behavior.
-- `src/types`: shared data contracts.
+## Project scripts
 
-The application uses server-rendered data fetching for provider requests and client components for search, filtering, theming, and watchlist interactions. The `POST /api/article-brief` endpoint validates article fields, calls the server-side AI provider, and returns an article-specific brief without exposing API credentials to the browser.
+| Command | Purpose |
+| --- | --- |
+| `npm run dev` | Start the development server |
+| `npm test` | Run unit tests |
+| `npm run typecheck` | Run TypeScript checks |
+| `npm run lint` | Run ESLint |
+| `npm run build` | Create a production build |
+| `npm run start` | Serve the production build |
 
 ## Known limitations
 
-- Historical charts currently support daily candles for 1M, 3M, and 1Y. Intraday intervals, benchmark comparison, volume, and calibrated market forecasts are not implemented yet.
-- Article analysis is based on the title and description returned by NewsAPI, not the full article text.
-- Topic filters use lightweight keyword matching rather than a trained classifier.
-- The watchlist is stored in the current browser and is not synchronized across devices.
-- Theme and feed preferences are stored in the current browser; they are not synchronized across devices.
-- Provider rate limits and API plan restrictions may affect data availability.
+- This is a **pet project**, not a production financial platform.
+- Provider coverage and freshness depend on external APIs, their rate limits, and the configured plan.
+- Historical charts currently support SPY, QQQ, GLD, and USO with daily candles over 1M, 3M, and 1Y ranges.
+- News filters are keyword-based and may misclassify stories.
+- AI analysis uses the title and description returned by the news provider; it does not verify the full linked article.
+- AI-generated summaries can be wrong and should be treated as reading assistance, not factual verification.
+- The project does not provide calibrated forecasts, trading recommendations, or personalized financial advice.
+- Hosted deployment availability is separate from source-code and CI status.
 
-## Deployment
+## Tech stack
 
-Configure the required environment variables in your hosting provider, then deploy the repository using its Next.js build support. Do not expose server-side provider keys through public client-side environment variables.
+- **Next.js** and **React** for the application and routing
+- **TypeScript** for typed application code
+- **Tailwind CSS** and custom CSS variables for layout and theming
+- **GSAP** and CSS motion for restrained interface animation
+- **Finnhub**, **Yahoo Finance**, **NewsAPI**, and **Groq** for provider-backed features
+- **Node.js built-in test runner** for business-logic unit tests
+
+## License
+
+No license has been added yet. Unless a license is added, standard copyright restrictions apply to reuse of this repository.
