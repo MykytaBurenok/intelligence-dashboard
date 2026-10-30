@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ApiClientError, requestJson, requireEnv } from "@/lib/api/client";
+import { HISTORICAL_RANGE_DAYS, HISTORICAL_SYMBOLS, isSupportedHistoryRequest, normalizeHistoryPoints } from "@/lib/market-history.mjs";
 
 export const dynamic = "force-dynamic";
 
-const ALLOWED_SYMBOLS = new Set(["SPY", "QQQ", "GLD", "USO"]);
-const RANGE_DAYS = { "1M": 30, "3M": 90, "1Y": 365 } as const;
-type RangeKey = keyof typeof RANGE_DAYS;
+type RangeKey = keyof typeof HISTORICAL_RANGE_DAYS;
 type HistoryPoint = { time: number; close: number };
 type FinnhubCandles = { s?: string; t?: number[]; c?: number[] };
 type YahooChartResponse = {
@@ -22,16 +21,6 @@ function isRange(value: string | null): value is RangeKey {
   return value !== null && Object.hasOwn(RANGE_DAYS, value);
 }
 
-function cleanPoints(times: number[] | undefined, closes: Array<number | null> | undefined, seconds = false): HistoryPoint[] {
-  if (!times || !closes || times.length !== closes.length) return [];
-
-  return times.flatMap((time, index) => {
-    const close = closes[index];
-    return Number.isFinite(time) && typeof close === "number" && Number.isFinite(close) && close > 0
-      ? [{ time: seconds ? time * 1000 : time, close }]
-      : [];
-  });
-}
 
 async function fetchFinnhubHistory(symbol: string, from: number, to: number): Promise<HistoryPoint[]> {
   const payload = await requestJson<FinnhubCandles>("https://finnhub.io/api/v1/stock/candle", {
@@ -40,7 +29,7 @@ async function fetchFinnhubHistory(symbol: string, from: number, to: number): Pr
     next: { revalidate: 900 },
   });
 
-  return payload.s === "ok" ? cleanPoints(payload.t, payload.c, true) : [];
+  return payload.s === "ok" ? normalizeHistoryPoints(payload.t, payload.c, true) : [];
 }
 
 async function fetchYahooHistory(symbol: string, from: number, to: number): Promise<HistoryPoint[]> {
@@ -56,7 +45,7 @@ async function fetchYahooHistory(symbol: string, from: number, to: number): Prom
     next: { revalidate: 900 },
   });
   const result = payload.chart?.result?.[0];
-  return cleanPoints(result?.timestamp, result?.indicators?.quote?.[0]?.close, true);
+  return normalizeHistoryPoints(result?.timestamp, result?.indicators?.quote?.[0]?.close, true);
 }
 
 export async function GET(request: NextRequest) {
@@ -64,15 +53,15 @@ export async function GET(request: NextRequest) {
   const symbol = (params.get("symbol") ?? "SPY").trim().toUpperCase();
   const range = params.get("range") ?? "3M";
 
-  if (!ALLOWED_SYMBOLS.has(symbol)) {
+  if (!HISTORICAL_SYMBOLS.has(symbol)) {
     return NextResponse.json({ error: "Unsupported symbol. Choose SPY, QQQ, GLD, or USO." }, { status: 400 });
   }
-  if (!isRange(range)) {
+  if (!Object.hasOwn(HISTORICAL_RANGE_DAYS, range)) {
     return NextResponse.json({ error: "Unsupported range. Choose 1M, 3M, or 1Y." }, { status: 400 });
   }
 
   const to = Math.floor(Date.now() / 1000);
-  const from = to - RANGE_DAYS[range] * 24 * 60 * 60;
+  const from = to - HISTORICAL_RANGE_DAYS[range as RangeKey] * 24 * 60 * 60;
   let points: HistoryPoint[] = [];
   let source = "";
 
