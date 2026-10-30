@@ -118,7 +118,7 @@ export default function Shell({ sidebar, header, rightPanel, children }: ShellPr
         <aside className="shell-sidebar" aria-label="Desktop sidebar">
           {sidebar}
           <button type="button" className="shell-resize-handle shell-resize-handle--left"
-            aria-label="Resize navigation sidebar. Minimum width 260px. Use arrow keys to adjust, double click to reset." role="separator" aria-orientation="vertical" aria-valuemin={MIN_SIDEBAR} aria-valuemax={MAX_SIDEBAR} aria-valuenow={sidebarWidth ?? (typeof window !== "undefined" && window.matchMedia("(min-width: 1280px)").matches ? 240 : 88)}
+            aria-label="Resize navigation sidebar. Minimum width 220px. Use arrow keys to adjust, double click to reset." role="separator" aria-orientation="vertical" aria-valuemin={MIN_SIDEBAR} aria-valuemax={MAX_SIDEBAR} aria-valuenow={sidebarWidth ?? (typeof window !== "undefined" && window.matchMedia("(min-width: 1280px)").matches ? 240 : 88)}
             onPointerDown={(event) => handlePointerDown("left", event)} onPointerMove={handlePointerMove}
             onPointerUp={finishResize} onPointerCancel={finishResize} onDoubleClick={() => resetWidth("left")}
             onKeyDown={(event) => {
