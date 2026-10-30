@@ -60,7 +60,7 @@ export default function Shell({ sidebar, header, rightPanel, children }: ShellPr
       repeat: -1,
       yoyo: true,
     });
-    return () => motion.kill();
+    return () => { motion.kill(); };
   }, []);
 
   useEffect(() => {
