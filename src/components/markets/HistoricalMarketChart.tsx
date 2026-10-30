@@ -76,7 +76,7 @@ export default function HistoricalMarketChart() {
   }, [data]);
 
   const selectedPoint = chart && activeIndex !== null ? chart.coords[activeIndex] : null;
-  const totalReturn = chart ? ((chart.last.close / chart.first.close) - 1) * 100 : 0;
+  const absoluteChange = chart ? chart.last.close - chart.first.close : 0;\n  const totalReturn = chart ? ((chart.last.close / chart.first.close) - 1) * 100 : 0;
 
   return (
     <section className="card overflow-hidden p-4 sm:p-6" aria-labelledby="historical-chart-title">
@@ -100,7 +100,7 @@ export default function HistoricalMarketChart() {
             <button key={item} type="button" aria-pressed={range === item} onClick={() => { setRange(item); setLoading(true); setError(""); setActiveIndex(null); }} className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${range === item ? "bg-[var(--accent)] text-white" : "text-[var(--text-muted)] hover:text-[var(--text)]"}`}>{item}</button>
           ))}
         </div>
-        {chart && !loading && <div className={`text-sm font-semibold ${totalReturn >= 0 ? "text-[var(--success)]" : "text-[var(--danger)]"}`}>{formatReturn(totalReturn)} <span className="font-normal text-[var(--text-faint)]">over {range}</span></div>}
+        {chart && !loading && <div className={`text-sm font-semibold ${totalReturn >= 0 ? "text-[var(--success)]" : "text-[var(--danger)]"}`}>{formatReturn(totalReturn)} <span className="font-normal text-[var(--text-faint)]">({formatChange(absoluteChange)}) over {range}</span></div>}
       </div>
 
       <div className="relative mt-4 min-h-[220px]">
@@ -132,7 +132,7 @@ export default function HistoricalMarketChart() {
               <div><p className="text-xs text-[var(--text-faint)]">Latest close</p><p className="mt-1 text-sm font-semibold text-[var(--text)]">{formatPrice(chart.last.close)}</p></div>
               <div><p className="text-xs text-[var(--text-faint)]">Period high</p><p className="mt-1 text-sm font-semibold text-[var(--text)]">{formatPrice(chart.max)}</p></div>
             </div>
-            <p className="mt-4 text-xs leading-5 text-[var(--text-faint)]">Daily closes are historical observations, not real-time ticks. Returns are calculated from the first and last available closes in this response. {data?.fetchedAt ? `Fetched ${new Date(data.fetchedAt).toLocaleString()}.` : ""}</p>
+            <p className="mt-4 text-xs leading-5 text-[var(--text-faint)]">Daily closes are historical observations, not real-time ticks. Change is calculated from the first and last available closes returned by the provider; missing sessions are not interpolated. {data?.fetchedAt ? `Last fetched ${new Date(data.fetchedAt).toLocaleString()}.` : ""}</p>
           </>
         ) : null}
       </div>
