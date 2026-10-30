@@ -99,7 +99,7 @@ export default function SettingsClient() {
                 setDensity(value);
                 savePreferences(defaultFilter, value);
               }}
-              className="rounded-xl border border-[var(--border)] bg-[var(--surface-soft)] px-3 py-3"
+              className="themed-select w-full rounded-xl px-3 py-3"
             >
               <option value="comfortable">Comfortable</option>
               <option value="compact">Compact</option>
